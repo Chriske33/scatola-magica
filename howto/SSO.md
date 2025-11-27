@@ -86,3 +86,4 @@ environment:
 This tells the app to use `localhost` for internal API calls instead of going through the reverse proxy. The default value is already `http://localhost:3000`, but explicitly setting it can help in some edge cases.
 
 **Why this happens**: When `APP_URL` is set to your external domain (e.g., `https://scatola-magica.domain.com`), the middleware tries to validate sessions by making a fetch request to `https://scatola-magica.domain.com/api/auth/check-session`. This request goes through your reverse proxy, which may block it with a 403 Forbidden response due to security policies or misconfigurations.
+

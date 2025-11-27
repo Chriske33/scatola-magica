@@ -48,10 +48,8 @@ Tired of bloated, EXPENSIVE cloud storage solutions? [Scatola Magica](https://sc
 - [Updating](#updating)
   - [Docker Compose](#docker-compose-1)
   - [Manual](#manual)
-- [API](#api)
 - [Shortcuts](#shortcuts)
 - [Single Sign-On (SSO) with OIDC](#single-sign-on-sso-with-oidc)
-- [Custom Themes and Emojis](#custom-themes-and-emojis)
 
 <p align="center">
   <br />
@@ -237,19 +235,6 @@ yarn build
 yarn start
 ```
 
-<a id="api"></a>
-
-## API
-
-`Scatola Magica` includes a REST API for programmatic access to your files and folders. This is perfect for:
-
-- **Automation:** Upload files from external systems
-- **Integrations:** Connect with other tools and services
-- **Scripts:** Automate file operations
-- **Backups:** Programmatic access to your files
-
-📖 **For the complete API documentation, see [howto/API.md](howto/API.md)**
-
 <a id="shortcuts"></a>
 
 ## SHORTCUTS
@@ -266,19 +251,11 @@ yarn start
 
 📖 **For the complete SSO documentation, see [howto/SSO.md](howto/SSO.md)**
 
-<a id="custom-themes-and-emojis"></a>
-
-## Custom Manifest
-
-You can completely customize your PWA by creating an override manifest file. This allows you to change the app name, description, icons, colors, and more. Custom themes and emojis can be managed through the admin UI.
-
-📖 **For the complete customisation documentation, see [howto/CUSTOMISATIONS.md](howto/CUSTOMISATIONS.md)**
-
-📖 **For better understanding on how the PWA works see [howto/PWA.md](howto/PWA.md)**
-
 ## License
 
-This project is licensed under [MIT License](LICENSE).
+This project is licensed under [GNU LESSER GENERAL PUBLIC LICENSE](LICENSE).
+I debated going for MIT, but I really want to protect this project and keep it open source.
+This means private corporations can use it, but they MUST keep their improvements open source as well.
 
 ## Support
 
