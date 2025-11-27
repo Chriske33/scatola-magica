@@ -21,21 +21,33 @@
 
 3. Set environment variables:
 
+**Required** (to show the SSO button and enable OIDC login):
+
 ```yaml
 services:
   scatola-magica:
     environment:
       - OIDC_ISSUER=https://YOUR_SSO_HOST/issuer/path
       - OIDC_CLIENT_ID=your_client_id
-      - APP_URL=https://your-scatola-magica-domain.com # if not set defaults to http://localhost:<port>
-      # Optional security enhancements:
+```
+
+**Recommended** (for proper redirects, especially behind reverse proxies):
+
+```yaml
+      - APP_URL=https://your-scatola-magica-domain.com
+```
+
+**Optional** (security enhancements and advanced features):
+
+```yaml
       - OIDC_CLIENT_SECRET=your_client_secret # Enable confidential client mode (if your provider requires it)
       - OIDC_ADMIN_GROUPS=admins # Map provider groups to admin role
       - OIDC_GROUPS_SCOPE=groups # Scope to request for groups (set to empty string or "no" to disable for providers like Entra ID)
       - OIDC_LOGOUT_URL=https://authprovider.local/realms/master/logout # Custom logout URL for global logout
-      # Optional for reverse proxy issues:
-      # - INTERNAL_API_URL=http://localhost:3000 # Use if getting 403 errors after SSO login
+      - INTERNAL_API_URL=http://localhost:3000 # Use if getting 403 errors after SSO login (behind reverse proxy)
 ```
+
+**Note**: The SSO button will appear on the login page when both `OIDC_ISSUER` and `OIDC_CLIENT_ID` are set. `APP_URL` is recommended but not required - if not set, it defaults to the request origin.
 
 **Note**: When OIDC_CLIENT_SECRET is set, Scatola Magica switches to confidential client mode using client authentication instead of PKCE. This is more secure but requires provider support.
 
@@ -44,16 +56,7 @@ Dev verified Providers:
 - Auth0 (`OIDC_ISSUER=https://YOUR_TENANT.REGION.auth0.com`)
 - Authentik (`OIDC_ISSUER=https://YOUR_DOMAIN/application/o/APP_SLUG/`)
 
-Other providers will likely work, but I can at least guarantee these do as I have test them both locally.
-
-Community verified Providers:
-
-- [Pocket ID](https://github.com/fccview/scatola-magica/issues/6#issuecomment-3350380435)(`OIDC_ISSUER: https://my-pocket-id.domain.com`)
-- [Authelia](https://github.com/fccview/scatola-magica/issues/6#issuecomment-3369291122) (`OIDC_ISSUER: https://my-authelia.domain.com`)
-- [Google](https://github.com/fccview/scatola-magica/issues/6#issuecomment-3437686494) (`OIDC_ISSUER: https://accounts.google.com`)
-- [Entra ID (Azure AD)](https://github.com/fccview/scatola-magica/issues/6#issuecomment-3464237999) (`OIDC_ISSUER: https://login.microsoftonline.com/{tenant-id}/v2.0`)
-
-Provider's specific notes:
+Some provider's specific notes:
 
 - **Google** provider doesn't support usage of `groups` with OIDC authentication, so do NOT set the `OIDC_ADMIN_GROUPS` environment variable.
 - **Entra ID** provider allows usage of admin groups with `OIDC_ADMIN_GROUPS={Entra Group ID}` variable. For that, ensure to include optional `groups` claim in the 'Token Configuration' pane of your 'Enterprise Registration' AND define the environment variable to `OIDC_GROUPS_SCOPE=""` or `OIDC_GROUPS_SCOPE="no"`.
