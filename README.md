@@ -6,7 +6,7 @@
 
 A simple, self-hosted file storage and management app.
 
-Tired of bloated, EXPENSIVE cloud storage solutions? [Scatola Magica](https://scatola-magica.example.com) is a lightweight alternative for managing your personal files and folders. It's built with Next.js 14, is easy to deploy, and keeps all your data on your own server.
+Tired of bloated, EXPENSIVE cloud storage solutions? Scatola Magica is a lightweight alternative for managing your personal files and folders. It's built with Next.js 14, is easy to deploy, and keeps all your data on your own server.
 
 ---
 
@@ -86,7 +86,7 @@ That said for the sake of sanity let's all follow the same structure:
 
 ## Tech Stack
 
-- **Framework:** Next.js 14
+- **Framework:** Next.js 15
 - **Language:** TypeScript
 - **Styling:** Tailwind CSS
 
