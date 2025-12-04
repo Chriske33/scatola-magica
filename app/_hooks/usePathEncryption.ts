@@ -3,9 +3,6 @@
 import { useCallback } from "react";
 import { usePreferences } from "@/app/_providers/PreferencesProvider";
 
-/**
- * Client-side hook for encrypting paths before navigation
- */
 export function usePathEncryption() {
   const { encryptionKey } = usePreferences();
 
@@ -14,8 +11,6 @@ export function usePathEncryption() {
       if (!encryptionKey || !path) return path;
 
       try {
-        // Simple synchronous encryption using btoa
-        // This is obfuscation, not cryptographic security
         const combined = `${encryptionKey}:${path}`;
         return btoa(combined)
           .replace(/\+/g, "-")

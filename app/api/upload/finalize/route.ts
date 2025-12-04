@@ -4,7 +4,6 @@ import { validateRequest } from "@/app/_lib/request-auth";
 
 export async function POST(request: NextRequest) {
   try {
-    // Validate authentication
     const user = await validateRequest(request);
     if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });

@@ -16,9 +16,6 @@ function base64UrlEncode(buffer: Buffer) {
 
 export async function POST(request: NextRequest) {
   try {
-    // Note: Login endpoint is publicly accessible (no auth required)
-    // This is the entry point for creating authentication sessions
-
     const { username, password } = await request.json();
 
     if (!username || !password) {

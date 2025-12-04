@@ -125,7 +125,6 @@ export default function ApiKeySection() {
         setCopied(true);
         setTimeout(() => setCopied(false), 2000);
       } else {
-        // Fallback for browsers without clipboard API
         const textArea = document.createElement("textarea");
         textArea.value = apiKey;
         textArea.style.position = "fixed";

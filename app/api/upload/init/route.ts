@@ -5,7 +5,6 @@ import { decryptPath } from "@/app/_lib/path-encryption";
 
 export async function POST(request: NextRequest) {
   try {
-    // Validate authentication
     const user = await validateRequest(request);
     if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });

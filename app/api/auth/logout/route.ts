@@ -6,7 +6,6 @@ import { isInternalRequest } from "@/app/_lib/request-auth";
 export const dynamic = "force-dynamic";
 
 export async function POST(request: NextRequest) {
-  // This endpoint is internal-only (session-based auth only)
   const isInternal = await isInternalRequest(request);
   if (!isInternal) {
     return NextResponse.json(
@@ -27,7 +26,6 @@ export async function POST(request: NextRequest) {
 }
 
 export async function GET(request: NextRequest) {
-  // This endpoint is internal-only (session-based auth only)
   const isInternal = await isInternalRequest(request);
   if (!isInternal) {
     return NextResponse.json(

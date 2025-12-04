@@ -9,7 +9,6 @@ export const dynamic = "force-dynamic";
 
 export async function GET(request: NextRequest) {
   try {
-    // This endpoint is internal-only (session-based auth only)
     const isInternal = await isInternalRequest(request);
     if (!isInternal) {
       return new NextResponse(

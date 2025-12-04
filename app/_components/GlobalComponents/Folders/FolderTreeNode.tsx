@@ -154,7 +154,6 @@ export default function FolderTreeNode({
     );
   }
 
-  // Encrypt the folder path for the URL
   const encryptedPath = encryptPath(folder.id);
   const folderHref = `/files/${encryptedPath
     .split("/")

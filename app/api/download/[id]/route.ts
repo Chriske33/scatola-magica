@@ -12,7 +12,6 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    // Validate authentication
     const user = await validateRequest(request);
     if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -41,7 +40,9 @@ export async function GET(
       start(controller) {
         fileStream.on("data", (chunk: Buffer | string) => {
           if (Buffer.isBuffer(chunk)) {
-            controller.enqueue(new Uint8Array(chunk.buffer, chunk.byteOffset, chunk.byteLength));
+            controller.enqueue(
+              new Uint8Array(chunk.buffer, chunk.byteOffset, chunk.byteLength)
+            );
           }
         });
         fileStream.on("end", () => {

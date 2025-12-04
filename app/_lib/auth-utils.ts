@@ -99,10 +99,11 @@ export async function deleteSession(sessionId: string): Promise<void> {
   await writeSessions(sessions);
 }
 
-// API Key generation and validation
-export async function generateApiKey(username: string, isAdmin: boolean): Promise<string> {
-  // Generate a random 32-character string (256 bits of entropy)
-  const randomBytes = crypto.randomBytes(24); // 24 bytes = 32 chars in base64url
+export async function generateApiKey(
+  username: string,
+  isAdmin: boolean
+): Promise<string> {
+  const randomBytes = crypto.randomBytes(24);
   const randomString = randomBytes
     .toString("base64")
     .replace(/\+/g, "-")
@@ -112,16 +113,16 @@ export async function generateApiKey(username: string, isAdmin: boolean): Promis
   return `ck_${randomString}`;
 }
 
-export async function verifyApiKey(apiKey: string): Promise<{ username: string; isAdmin: boolean } | null> {
+export async function verifyApiKey(
+  apiKey: string
+): Promise<{ username: string; isAdmin: boolean } | null> {
   try {
-    // Check if it starts with ck_
     if (!apiKey.startsWith("ck_")) {
       return null;
     }
 
-    // Verify the user still exists and the API key matches
     const users = await readUsers();
-    const user = users.find(u => u.apiKey === apiKey);
+    const user = users.find((u) => u.apiKey === apiKey);
 
     if (!user) {
       return null;
@@ -129,7 +130,7 @@ export async function verifyApiKey(apiKey: string): Promise<{ username: string; 
 
     return {
       username: user.username,
-      isAdmin: user.isAdmin || false
+      isAdmin: user.isAdmin || false,
     };
   } catch {
     return null;

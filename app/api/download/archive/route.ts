@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import archiver from "archiver";
 import { stat } from "fs/promises";
 import path from "path";
+import { PassThrough } from "stream";
 import { validateRequest } from "@/app/_lib/request-auth";
 import { decryptPath } from "@/app/_lib/path-encryption";
 
@@ -21,7 +22,6 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "No paths provided" }, { status: 400 });
     }
 
-    // Decrypt paths if encryption is enabled
     const decryptedPaths = paths.map((p) => decryptPath(p));
 
     const isAdmin = currentUser.isAdmin;
@@ -38,10 +38,13 @@ export async function POST(request: NextRequest) {
       const resolvedUploadDir = path.resolve(UPLOAD_DIR);
 
       if (!resolvedPath.startsWith(resolvedUploadDir)) {
-        return NextResponse.json({
-          error: "Invalid path",
-          debug: { actualPath, resolvedPath, resolvedUploadDir }
-        }, { status: 403 });
+        return NextResponse.json(
+          {
+            error: "Invalid path",
+            debug: { actualPath, resolvedPath, resolvedUploadDir },
+          },
+          { status: 403 }
+        );
       }
 
       try {
@@ -64,7 +67,6 @@ export async function POST(request: NextRequest) {
       archiveName = `archive-${Date.now()}.zip`;
     }
 
-    const { PassThrough } = await import("stream");
     const passThrough = new PassThrough();
 
     const archive = archiver("zip", {
