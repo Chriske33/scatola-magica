@@ -1,6 +1,12 @@
 "use client";
 
-import { createContext, useContext, useState, useCallback, ReactNode } from "react";
+import {
+  createContext,
+  useContext,
+  useState,
+  useCallback,
+  ReactNode,
+} from "react";
 import ContextMenu, {
   ContextMenuItem,
 } from "@/app/_components/GlobalComponents/Layout/ContextMenu";
@@ -17,6 +23,8 @@ interface ContextMenuActions {
   onFileRename?: (fileId: string, fileName: string) => void;
   onFileMove?: (fileId: string) => void;
   onFileDownload?: (fileId: string) => void;
+  onFileEncrypt?: (fileId: string) => void;
+  onFileDecrypt?: (fileId: string) => void;
   onFileDelete?: (fileId: string) => void;
   onFolderRename?: (folderId: string, folderName: string) => void;
   onFolderDownload?: (folderId: string) => void;
@@ -116,6 +124,7 @@ export default function ContextMenuProvider({
       if (target.type === "file") {
         const extension = target.name?.split(".").pop()?.toLowerCase() || "";
         const isViewable = VIEWABLE_EXTENSIONS.includes(extension);
+        const isEncrypted = target.name?.endsWith(".gpg") || false;
 
         if (isViewable && actions.onFileOpen && target.id) {
           items.push({
@@ -154,15 +163,54 @@ export default function ContextMenuProvider({
           });
         }
 
+        if (isEncrypted && actions.onFileDecrypt && target.id) {
+          if (items.length > 0) {
+            items.push({
+              label: "",
+              icon: "",
+              onClick: () => {},
+              divider: true,
+            });
+          }
+          items.push({
+            label: "Decrypt",
+            icon: "lock_open",
+            onClick: () => actions.onFileDecrypt!(target.id!),
+          });
+        }
+
+        if (!isEncrypted && actions.onFileEncrypt && target.id) {
+          if (items.length > 0) {
+            items.push({
+              label: "",
+              icon: "",
+              onClick: () => {},
+              divider: true,
+            });
+          }
+          items.push({
+            label: "Encrypt",
+            icon: "lock",
+            onClick: () => actions.onFileEncrypt!(target.id!),
+          });
+        }
+
         if (actions.onFileDelete && target.id) {
           if (items.length > 0) {
-            items.push({ label: "", icon: "", onClick: () => {}, divider: true });
+            items.push({
+              label: "",
+              icon: "",
+              onClick: () => {},
+              divider: true,
+            });
           }
           items.push({
             label: "Delete",
             icon: "delete",
             onClick: () => {
-              if (confirm(`Are you sure you want to delete "${target.name}"?`)) {
+              if (
+                confirm(`Are you sure you want to delete "${target.name}"?`)
+              ) {
                 actions.onFileDelete!(target.id!);
               }
             },
@@ -209,7 +257,12 @@ export default function ContextMenuProvider({
 
         if (actions.onFolderDelete && target.id) {
           if (items.length > 0) {
-            items.push({ label: "", icon: "", onClick: () => {}, divider: true });
+            items.push({
+              label: "",
+              icon: "",
+              onClick: () => {},
+              divider: true,
+            });
           }
           items.push({
             label: "Delete Folder",

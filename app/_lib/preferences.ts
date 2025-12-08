@@ -8,6 +8,7 @@ export interface UserPreferences {
   username: string;
   particlesEnabled: boolean;
   wandCursorEnabled: boolean;
+  customKeysPath?: string;
 }
 
 function getPreferencesFile(): string {
@@ -24,9 +25,7 @@ async function readPreferences(): Promise<UserPreferences[]> {
   }
 }
 
-async function writePreferences(
-  preferences: UserPreferences[]
-): Promise<void> {
+async function writePreferences(preferences: UserPreferences[]): Promise<void> {
   const file = getPreferencesFile();
   try {
     await fs.access(file);
@@ -51,6 +50,7 @@ export async function getUserPreferences(
       username,
       particlesEnabled: true,
       wandCursorEnabled: true,
+      customKeysPath: undefined,
     }
   );
 }
@@ -77,6 +77,11 @@ export async function updateUserPreferences(
         (existingIndex >= 0
           ? allPreferences[existingIndex].wandCursorEnabled
           : true),
+      customKeysPath:
+        updates.customKeysPath ??
+        (existingIndex >= 0
+          ? allPreferences[existingIndex].customKeysPath
+          : undefined),
     };
 
     if (existingIndex >= 0) {

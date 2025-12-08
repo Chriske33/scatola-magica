@@ -60,6 +60,7 @@ export const TEXT_EXTENSIONS = [
   "conf",
   "ini",
   "env",
+  "gpg",
 ];
 
 export const IMAGE_EXTENSIONS = [

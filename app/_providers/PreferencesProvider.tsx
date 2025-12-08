@@ -8,6 +8,7 @@ interface PreferencesContextType {
   wandCursorEnabled: boolean;
   user: Partial<User> | null;
   encryptionKey: string | null;
+  customKeysPath?: string;
 }
 
 const PreferencesContext = createContext<PreferencesContextType>({
@@ -15,6 +16,7 @@ const PreferencesContext = createContext<PreferencesContextType>({
   wandCursorEnabled: true,
   user: null,
   encryptionKey: null,
+  customKeysPath: undefined,
 });
 
 export function PreferencesProvider({

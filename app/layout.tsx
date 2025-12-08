@@ -88,6 +88,7 @@ const RootLayout = async ({
               wandCursorEnabled: preferences.wandCursorEnabled,
               user: currentUser,
               encryptionKey,
+              customKeysPath: preferences.customKeysPath,
             }}
           >
             <UsersProvider initialUsers={initialUsers}>

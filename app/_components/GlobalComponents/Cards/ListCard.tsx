@@ -21,6 +21,8 @@ interface ListCardProps {
   onMove?: (id: string) => void;
   onRename?: (id: string, newName: string) => void;
   onOpen?: (id: string) => void;
+  onEncrypt?: (id: string) => void;
+  onDecrypt?: (id: string) => void;
   isSelectionMode?: boolean;
   isSelected?: boolean;
   onToggleSelect?: () => void;
@@ -37,6 +39,8 @@ export default function ListCard({
   onMove,
   onRename,
   onOpen,
+  onEncrypt,
+  onDecrypt,
   isSelectionMode = false,
   isSelected = false,
   onToggleSelect,
@@ -108,6 +112,8 @@ export default function ListCard({
         onFileRename: isFolder ? undefined : onRename,
         onFileMove: isFolder ? undefined : onMove,
         onFileDownload: isFolder ? undefined : onDownload,
+        onFileEncrypt: isFolder ? undefined : onEncrypt,
+        onFileDecrypt: isFolder ? undefined : onDecrypt,
         onFileDelete: isFolder ? undefined : onDelete,
         onFolderRename: isFolder ? onRename : undefined,
         onFolderDownload: isFolder ? onDownload : undefined,

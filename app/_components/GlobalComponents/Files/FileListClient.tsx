@@ -10,11 +10,14 @@ import {
   updateFolder,
   type FolderMetadata,
 } from "@/app/_server/actions/folders";
+import { encryptFile, decryptFile } from "@/app/_server/actions/files/encryption";
 import FileCard from "@/app/_components/GlobalComponents/Cards/FileCard";
 import FileListSelectionBar from "@/app/_components/GlobalComponents/Files/FileListSelectionBar";
 import FileListToolbar from "@/app/_components/GlobalComponents/Files/FileListToolbar";
 import Icon from "@/app/_components/GlobalComponents/Icons/Icon";
 import MoveFileDialog from "@/app/_components/FeatureComponents/FilesPage/MoveFileDialog";
+import EncryptFileModal from "@/app/_components/FeatureComponents/Modals/EncryptFileModal";
+import DecryptFileModal from "@/app/_components/FeatureComponents/Modals/DecryptFileModal";
 import Progress from "@/app/_components/GlobalComponents/Layout/Progress";
 import { useShortcuts } from "@/app/_providers/ShortcutsProvider";
 import { useContextMenu } from "@/app/_providers/ContextMenuProvider";
@@ -75,6 +78,8 @@ export default function FileListClient({
   const [deletingFileId, setDeletingFileId] = useState<string | null>(null);
   const [deletingFolderId, setDeletingFolderId] = useState<string | null>(null);
   const [moveFileIds, setMoveFileIds] = useState<string[]>([]);
+  const [encryptingFileId, setEncryptingFileId] = useState<string | null>(null);
+  const [decryptingFileId, setDecryptingFileId] = useState<string | null>(null);
   const [selectedFileIds, setSelectedFileIds] = useState<Set<string>>(
     new Set()
   );
@@ -250,6 +255,38 @@ export default function FileListClient({
     if (file) {
       const fileUrl = `/api/download/${encodeURIComponent(id)}`;
       openFile(id, file.originalName, fileUrl);
+    }
+  };
+
+  const handleEncrypt = async (deleteOriginal: boolean, customPublicKey?: string) => {
+    if (!encryptingFileId) return;
+
+    try {
+      const result = await encryptFile(encryptingFileId, deleteOriginal, customPublicKey);
+      if (result.success) {
+        router.refresh();
+      } else {
+        alert(result.message);
+      }
+    } catch (error) {
+      console.error("Encryption failed:", error);
+      alert("Failed to encrypt file");
+    }
+  };
+
+  const handleDecrypt = async (password: string, outputName: string, deleteEncrypted: boolean, customPrivateKey?: string) => {
+    if (!decryptingFileId) return;
+
+    try {
+      const result = await decryptFile(decryptingFileId, password, outputName, deleteEncrypted, customPrivateKey);
+      if (result.success) {
+        router.refresh();
+      } else {
+        alert(result.message);
+      }
+    } catch (error) {
+      console.error("Decryption failed:", error);
+      alert("Failed to decrypt file");
     }
   };
 
@@ -510,6 +547,8 @@ export default function FileListClient({
             onMove={() => setMoveFileIds([file.id])}
             onRename={handleRenameFile}
             onOpen={handleFileOpen}
+            onEncrypt={() => setEncryptingFileId(file.id)}
+            onDecrypt={() => setDecryptingFileId(file.id)}
             isSelectionMode={isSelectionMode}
             isSelected={selectedFileIds.has(file.id)}
             onToggleSelect={() => toggleFileSelection(file.id)}
@@ -541,6 +580,26 @@ export default function FileListClient({
             setMoveFileIds([]);
             clearSelection();
           }}
+        />
+      )}
+
+      {encryptingFileId && (
+        <EncryptFileModal
+          isOpen={true}
+          onClose={() => setEncryptingFileId(null)}
+          fileName={allFiles.find((f) => f.id === encryptingFileId)?.originalName || ""}
+          fileId={encryptingFileId}
+          onEncrypt={handleEncrypt}
+        />
+      )}
+
+      {decryptingFileId && (
+        <DecryptFileModal
+          isOpen={true}
+          onClose={() => setDecryptingFileId(null)}
+          fileName={allFiles.find((f) => f.id === decryptingFileId)?.originalName || ""}
+          fileId={decryptingFileId}
+          onDecrypt={handleDecrypt}
         />
       )}
     </div>

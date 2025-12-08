@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import ProfileTab from "@/app/_components/FeatureComponents/SettingsPage/ProfileTab";
 import PreferencesTab from "@/app/_components/FeatureComponents/SettingsPage/PreferencesTab";
+import EncryptionTab from "@/app/_components/FeatureComponents/SettingsPage/EncryptionTab";
 import UsersTab from "@/app/_components/FeatureComponents/SettingsPage/UsersTab";
 import TopAppBar from "@/app/_components/GlobalComponents/Layout/TopAppBar";
 import ThemeToggle from "@/app/_components/GlobalComponents/Layout/ThemeToggle";
@@ -15,7 +16,7 @@ import Icon from "@/app/_components/GlobalComponents/Icons/Icon";
 import { SidebarProvider } from "@/app/_providers/SidebarProvider";
 import { usePreferences } from "@/app/_providers/PreferencesProvider";
 
-type Tab = "profile" | "preferences" | "users";
+type Tab = "profile" | "preferences" | "encryption" | "users";
 
 export default function SettingsPage() {
   const { user } = usePreferences();
@@ -28,6 +29,7 @@ export default function SettingsPage() {
   const tabs: { id: Tab; label: string; icon: string }[] = [
     { id: "profile", label: "Profile", icon: "person" },
     { id: "preferences", label: "Preferences", icon: "tune" },
+    { id: "encryption", label: "Encryption", icon: "lock" },
     ...(user.isAdmin
       ? [{ id: "users" as Tab, label: "Users", icon: "group" }]
       : []),
@@ -95,6 +97,7 @@ export default function SettingsPage() {
 
                 {activeTab === "profile" && <ProfileTab />}
                 {activeTab === "preferences" && <PreferencesTab />}
+                {activeTab === "encryption" && <EncryptionTab />}
                 {activeTab === "users" && <UsersTab />}
               </div>
             </main>

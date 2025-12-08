@@ -13,6 +13,8 @@ interface FileCardProps {
   onMove?: (id: string) => void;
   onRename?: (id: string, newName: string) => void;
   onOpen?: (id: string) => void;
+  onEncrypt?: (id: string) => void;
+  onDecrypt?: (id: string) => void;
   viewMode?: "grid" | "list";
   isSelectionMode?: boolean;
   isSelected?: boolean;
@@ -30,6 +32,8 @@ export default function FileCard({
   onMove,
   onRename,
   onOpen,
+  onEncrypt,
+  onDecrypt,
   viewMode = "grid",
   isSelectionMode = false,
   isSelected = false,
@@ -48,6 +52,8 @@ export default function FileCard({
         onMove={onMove}
         onRename={onRename}
         onOpen={onOpen}
+        onEncrypt={onEncrypt}
+        onDecrypt={onDecrypt}
         isSelectionMode={isSelectionMode}
         isSelected={isSelected}
         onToggleSelect={onToggleSelect}
@@ -67,6 +73,8 @@ export default function FileCard({
       onMove={onMove}
       onRename={onRename}
       onOpen={onOpen}
+      onEncrypt={onEncrypt}
+      onDecrypt={onDecrypt}
       isSelectionMode={isSelectionMode}
       isSelected={isSelected}
       onToggleSelect={onToggleSelect}

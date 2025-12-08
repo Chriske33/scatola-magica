@@ -16,6 +16,9 @@ export function getFileIconInfo(fileName: string): FileIconInfo {
     return { materialIcon: "insert_drive_file" };
   }
 
+  // Extensions that should use Material Icons instead of brand icons
+  const useMaterialIcon = ["gpg"];
+
   const materialIconMap: Record<string, string> = {
     pdf: "picture_as_pdf",
     doc: "description",
@@ -104,9 +107,17 @@ export function getFileIconInfo(fileName: string): FileIconInfo {
     woff: "text_fields",
     woff2: "text_fields",
     eot: "text_fields",
+    gpg: "lock",
   };
 
   const materialIcon = materialIconMap[ext] || "insert_drive_file";
+
+  // Don't return extension for files that should use Material Icons
+  if (useMaterialIcon.includes(ext)) {
+    return {
+      materialIcon,
+    };
+  }
 
   return {
     materialIcon,
