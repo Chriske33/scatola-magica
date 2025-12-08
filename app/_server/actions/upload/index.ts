@@ -73,15 +73,6 @@ export async function initializeUpload(
       folderPath,
     });
 
-    console.log("Upload session initialized:", {
-      uploadId,
-      fileName,
-      totalChunks,
-      folderPath,
-      sessionCount: uploadSessions.size,
-      allSessions: Array.from(uploadSessions.keys()),
-    });
-
     return { success: true };
   } catch (error) {
     console.error("Initialize upload error:", error);
@@ -116,12 +107,6 @@ export async function uploadChunk(
       });
       return { success: false, error: "Invalid chunk data" };
     }
-
-    console.log("Looking for upload session:", {
-      uploadId,
-      sessionCount: uploadSessions.size,
-      allSessions: Array.from(uploadSessions.keys()),
-    });
 
     const session = uploadSessions.get(uploadId);
 
@@ -195,16 +180,6 @@ async function assembleFile(
     }
 
     const targetDir = path.join(UPLOAD_DIR, actualFolderPath);
-
-    console.log("Assembling file:", {
-      uploadId,
-      fileName: session.fileName,
-      folderPath: session.folderPath,
-      actualFolderPath,
-      targetDir,
-      username: currentUser.username,
-      isAdmin: currentUser.isAdmin,
-    });
 
     await mkdir(targetDir, { recursive: true });
 

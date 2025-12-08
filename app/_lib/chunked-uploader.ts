@@ -41,15 +41,12 @@ export class ChunkedUploader {
   }
 
   async upload(): Promise<string> {
-    console.log(`[${this.file.name}] ChunkedUploader.upload() called`);
     this.startTime = Date.now();
     this.abortController = new AbortController();
 
     try {
-      console.log(`[${this.file.name}] Detecting optimal chunk size...`);
       await this.detectOptimalChunkSize();
 
-      console.log(`[${this.file.name}] Creating chunks...`);
       this.createChunks();
 
       if (this.onProgressCallback) {
@@ -67,11 +64,7 @@ export class ChunkedUploader {
         });
       }
 
-      console.log(`[${this.file.name}] Initializing upload session...`);
       await this.initializeUploadSession();
-      console.log(
-        `[${this.file.name}] Upload session initialized, starting chunks...`
-      );
 
       await this.uploadChunksInParallel();
 
@@ -99,11 +92,6 @@ export class ChunkedUploader {
 
     if (isLocalNetwork) {
       this.chunkSize = ADAPTIVE_CHUNK_SIZES.ULTRA_FAST;
-      console.log(
-        "Local network detected, using ULTRA_FAST chunks:",
-        this.chunkSize / 1024 / 1024,
-        "MB"
-      );
       return;
     }
 

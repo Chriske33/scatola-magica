@@ -8,6 +8,8 @@ import UsersProvider from "@/app/_providers/UsersProvider";
 import ThemeProvider from "@/app/_providers/ThemeProvider";
 import ShortcutsProvider from "@/app/_providers/ShortcutsProvider";
 import ContextMenuProvider from "@/app/_providers/ContextMenuProvider";
+import FileViewerProvider from "@/app/_providers/FileViewerProvider";
+import FileViewer from "@/app/_components/FeatureComponents/Modals/FileViewer";
 import { PreferencesProvider } from "@/app/_providers/PreferencesProvider";
 import { getCurrentUser, readUsers } from "@/app/_server/actions/auth";
 import { getUserPreferences } from "@/app/_lib/preferences";
@@ -92,7 +94,10 @@ const RootLayout = async ({
               <FoldersProvider>
                 <ShortcutsProvider>
                   <ContextMenuProvider>
-                    <UploadOverlayProvider>{children}</UploadOverlayProvider>
+                    <FileViewerProvider>
+                      <UploadOverlayProvider>{children}</UploadOverlayProvider>
+                      <FileViewer />
+                    </FileViewerProvider>
                   </ContextMenuProvider>
                 </ShortcutsProvider>
               </FoldersProvider>

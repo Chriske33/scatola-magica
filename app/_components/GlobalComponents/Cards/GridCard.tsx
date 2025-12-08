@@ -20,6 +20,7 @@ interface GridCardProps {
   onDownload?: (id: string) => void;
   onMove?: (id: string) => void;
   onRename?: (id: string, newName: string) => void;
+  onOpen?: (id: string) => void;
   isSelectionMode?: boolean;
   isSelected?: boolean;
   onToggleSelect?: () => void;
@@ -35,6 +36,7 @@ export default function GridCard({
   onDownload,
   onMove,
   onRename,
+  onOpen,
   isSelectionMode = false,
   isSelected = false,
   onToggleSelect,
@@ -102,6 +104,7 @@ export default function GridCard({
         name: itemName,
       },
       {
+        onFileOpen: isFolder ? undefined : onOpen,
         onFileRename: isFolder ? undefined : onRename,
         onFileMove: isFolder ? undefined : onMove,
         onFileDownload: isFolder ? undefined : onDownload,
@@ -111,6 +114,16 @@ export default function GridCard({
         onFolderDelete: isFolder ? onDelete : undefined,
       }
     );
+  };
+
+  const handleDoubleClick = (e: React.MouseEvent) => {
+    if (isSelectionMode || isRenaming) return;
+
+    if (!isFolder && onOpen) {
+      e.preventDefault();
+      e.stopPropagation();
+      onOpen(itemId);
+    }
   };
 
   const renderItemName = () => {
@@ -206,6 +219,7 @@ export default function GridCard({
         isSelectionMode ? "cursor-pointer" : ""
       } ${isSelected ? "bg-primary/10 hover:bg-primary/15" : ""}`}
       onClick={isSelectionMode ? onToggleSelect : undefined}
+      onDoubleClick={handleDoubleClick}
       onContextMenu={handleContextMenu}
     >
       <div className="flex flex-col items-center text-center">

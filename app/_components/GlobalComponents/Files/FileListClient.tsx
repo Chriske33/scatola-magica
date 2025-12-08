@@ -18,6 +18,7 @@ import MoveFileDialog from "@/app/_components/FeatureComponents/FilesPage/MoveFi
 import Progress from "@/app/_components/GlobalComponents/Layout/Progress";
 import { useShortcuts } from "@/app/_providers/ShortcutsProvider";
 import { useContextMenu } from "@/app/_providers/ContextMenuProvider";
+import { useFileViewer } from "@/app/_providers/FileViewerProvider";
 
 interface FileListClientProps {
   files: FileMetadata[];
@@ -46,6 +47,7 @@ export default function FileListClient({
   const searchParams = useSearchParams();
   const { registerActions } = useShortcuts();
   const { showContextMenu } = useContextMenu();
+  const { openFile } = useFileViewer();
   const currentFolderId = searchParams.get("folderId");
   const [viewMode, setViewMode] = useState<FileViewMode>(FileViewMode.GRID);
   const [isMounted, setIsMounted] = useState(false);
@@ -240,7 +242,15 @@ export default function FileListClient({
   };
 
   const handleDownload = (id: string) => {
-    window.open(`/api/download/${id}`, "_blank");
+    window.open(`/api/download/${encodeURIComponent(id)}`, "_blank");
+  };
+
+  const handleFileOpen = (id: string) => {
+    const file = allFiles.find((f) => f.id === id);
+    if (file) {
+      const fileUrl = `/api/download/${encodeURIComponent(id)}`;
+      openFile(id, file.originalName, fileUrl);
+    }
   };
 
   const handleDownloadArchive = async (paths: string[]) => {
@@ -499,6 +509,7 @@ export default function FileListClient({
             onDownload={handleDownload}
             onMove={() => setMoveFileIds([file.id])}
             onRename={handleRenameFile}
+            onOpen={handleFileOpen}
             isSelectionMode={isSelectionMode}
             isSelected={selectedFileIds.has(file.id)}
             onToggleSelect={() => toggleFileSelection(file.id)}

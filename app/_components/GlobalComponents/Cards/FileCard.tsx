@@ -12,6 +12,7 @@ interface FileCardProps {
   onDownload?: (id: string) => void;
   onMove?: (id: string) => void;
   onRename?: (id: string, newName: string) => void;
+  onOpen?: (id: string) => void;
   viewMode?: "grid" | "list";
   isSelectionMode?: boolean;
   isSelected?: boolean;
@@ -28,6 +29,7 @@ export default function FileCard({
   onDownload,
   onMove,
   onRename,
+  onOpen,
   viewMode = "grid",
   isSelectionMode = false,
   isSelected = false,
@@ -45,6 +47,7 @@ export default function FileCard({
         onDownload={onDownload}
         onMove={onMove}
         onRename={onRename}
+        onOpen={onOpen}
         isSelectionMode={isSelectionMode}
         isSelected={isSelected}
         onToggleSelect={onToggleSelect}
@@ -63,6 +66,7 @@ export default function FileCard({
       onDownload={onDownload}
       onMove={onMove}
       onRename={onRename}
+      onOpen={onOpen}
       isSelectionMode={isSelectionMode}
       isSelected={isSelected}
       onToggleSelect={onToggleSelect}

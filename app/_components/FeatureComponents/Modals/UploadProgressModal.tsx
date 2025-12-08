@@ -65,11 +65,6 @@ export default function UploadProgressModal({
             initialFolderPath
           );
         } else if (initialFiles && initialFiles.length > 0) {
-          console.log(
-            "Processing files:",
-            initialFiles.length,
-            Array.from(initialFiles).map((f) => f.name)
-          );
           handleFileSelect(initialFiles, initialFolderPath);
         }
       }

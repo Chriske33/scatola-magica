@@ -13,6 +13,7 @@ export interface ContextMenuTarget {
 }
 
 interface ContextMenuActions {
+  onFileOpen?: (fileId: string) => void;
   onFileRename?: (fileId: string, fileName: string) => void;
   onFileMove?: (fileId: string) => void;
   onFileDownload?: (fileId: string) => void;
@@ -43,6 +44,56 @@ export const useContextMenu = () => {
   return context;
 };
 
+const VIEWABLE_EXTENSIONS = [
+  "txt",
+  "md",
+  "markdown",
+  "html",
+  "css",
+  "js",
+  "jsx",
+  "ts",
+  "tsx",
+  "json",
+  "xml",
+  "yaml",
+  "yml",
+  "sh",
+  "bash",
+  "py",
+  "java",
+  "c",
+  "cpp",
+  "h",
+  "hpp",
+  "go",
+  "rs",
+  "php",
+  "rb",
+  "sql",
+  "log",
+  "csv",
+  "config",
+  "conf",
+  "ini",
+  "env",
+  "jpg",
+  "jpeg",
+  "png",
+  "gif",
+  "svg",
+  "webp",
+  "bmp",
+  "ico",
+  "mp4",
+  "webm",
+  "ogg",
+  "mov",
+  "avi",
+  "mkv",
+  "pdf",
+];
+
 export default function ContextMenuProvider({
   children,
 }: {
@@ -63,6 +114,17 @@ export default function ContextMenuProvider({
       const items: ContextMenuItem[] = [];
 
       if (target.type === "file") {
+        const extension = target.name?.split(".").pop()?.toLowerCase() || "";
+        const isViewable = VIEWABLE_EXTENSIONS.includes(extension);
+
+        if (isViewable && actions.onFileOpen && target.id) {
+          items.push({
+            label: "Open",
+            icon: "open_in_new",
+            onClick: () => actions.onFileOpen!(target.id!),
+          });
+        }
+
         if (actions.onFileRename && target.id && target.name) {
           items.push({
             label: "Rename",

@@ -65,7 +65,6 @@ export const useUploadPage = () => {
     fileToUpload: UploadingFile,
     targetFolderPath?: string
   ) => {
-    console.log(`[${fileToUpload.file.name}] Starting upload function`);
     try {
       const uploader = new ChunkedUploader(
         fileToUpload.file,
@@ -92,9 +91,7 @@ export const useUploadPage = () => {
         )
       );
 
-      console.log(`[${fileToUpload.file.name}] Calling uploader.upload()`);
       const fileId = await uploader.upload();
-      console.log(`[${fileToUpload.file.name}] Upload completed`);
 
       setFiles((prev) =>
         prev.map((f) =>
@@ -128,12 +125,6 @@ export const useUploadPage = () => {
       targetFolderPath !== undefined ? targetFolderPath : selectedFolderPath;
 
     const filesArray = Array.from(selectedFiles);
-    console.log(
-      "handleFileSelect called with",
-      filesArray.length,
-      "files:",
-      filesArray.map((f) => f.name)
-    );
 
     const newFiles: UploadingFile[] = filesArray.map((file, index) => ({
       id: `${Date.now()}-${index}-${Math.random().toString(36).substring(2)}`,
@@ -143,21 +134,12 @@ export const useUploadPage = () => {
       status: UploadStatus.PENDING,
     }));
 
-    console.log(
-      "Created",
-      newFiles.length,
-      "uploading files:",
-      newFiles.map((f) => f.file.name)
-    );
-
     setFiles((prev) => {
       const updated = [...prev, ...newFiles];
-      console.log("Total files in state:", updated.length);
       return updated;
     });
 
     for (const f of newFiles) {
-      console.log(`Starting upload for:`, f.file.name);
       uploadFile(f, folderPath || undefined).catch((error) => {
         console.error(`Upload failed for ${f.file.name}:`, error);
       });
