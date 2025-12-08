@@ -1,6 +1,9 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import { ChunkedUploader } from "@/app/_lib/chunked-uploader";
+import {
+  ChunkedUploader,
+  E2EEncryptionOptions,
+} from "@/app/_lib/chunked-uploader";
 import { UploadStatus } from "@/app/_types/enums";
 import { UploadProgress } from "@/app/_types";
 import {
@@ -29,6 +32,9 @@ export const useUploadPage = () => {
   const [isDragging, setIsDragging] = useState(false);
   const [hadInterruptedUploads, setHadInterruptedUploads] = useState(false);
   const [selectedFolderPath, setSelectedFolderPath] = useState<string>("");
+  const [e2eEncryption, setE2eEncryption] = useState<
+    E2EEncryptionOptions | undefined
+  >(undefined);
 
   useEffect(() => {
     const hadActiveUploads =
@@ -63,14 +69,16 @@ export const useUploadPage = () => {
 
   const uploadFile = async (
     fileToUpload: UploadingFile,
-    targetFolderPath?: string
+    targetFolderPath?: string,
+    encryption?: E2EEncryptionOptions
   ) => {
     try {
       const uploader = new ChunkedUploader(
         fileToUpload.file,
         undefined,
         undefined,
-        targetFolderPath || undefined
+        targetFolderPath || undefined,
+        encryption || e2eEncryption
       );
 
       uploader.onProgress((progress) => {
@@ -97,11 +105,11 @@ export const useUploadPage = () => {
         prev.map((f) =>
           f.id === fileToUpload.id
             ? {
-                ...f,
-                status: UploadStatus.COMPLETED,
-                fileId: fileId,
-                folderPath: targetFolderPath || selectedFolderPath,
-              }
+              ...f,
+              status: UploadStatus.COMPLETED,
+              fileId: fileId,
+              folderPath: targetFolderPath || selectedFolderPath,
+            }
             : f
         )
       );
@@ -115,36 +123,40 @@ export const useUploadPage = () => {
     }
   };
 
-  const handleFileSelect = (
-    selectedFiles: FileList | null,
-    targetFolderPath?: string
-  ) => {
-    if (!selectedFiles || selectedFiles.length === 0) return;
+  const handleFileSelect = useCallback(
+    (
+      selectedFiles: FileList | null,
+      targetFolderPath?: string,
+      encryption?: E2EEncryptionOptions
+    ) => {
+      if (!selectedFiles || selectedFiles.length === 0) return;
 
-    const folderPath =
-      targetFolderPath !== undefined ? targetFolderPath : selectedFolderPath;
+      const folderPath =
+        targetFolderPath !== undefined ? targetFolderPath : selectedFolderPath;
 
-    const filesArray = Array.from(selectedFiles);
+      const filesArray = Array.from(selectedFiles);
 
-    const newFiles: UploadingFile[] = filesArray.map((file, index) => ({
-      id: `${Date.now()}-${index}-${Math.random().toString(36).substring(2)}`,
-      file,
-      progress: null,
-      uploader: null,
-      status: UploadStatus.PENDING,
-    }));
+      const newFiles: UploadingFile[] = filesArray.map((file, index) => ({
+        id: `${Date.now()}-${index}-${Math.random().toString(36).substring(2)}`,
+        file,
+        progress: null,
+        uploader: null,
+        status: UploadStatus.PENDING,
+      }));
 
-    setFiles((prev) => {
-      const updated = [...prev, ...newFiles];
-      return updated;
-    });
-
-    for (const f of newFiles) {
-      uploadFile(f, folderPath || undefined).catch((error) => {
-        console.error(`Upload failed for ${f.file.name}:`, error);
+      setFiles((prev) => {
+        const updated = [...prev, ...newFiles];
+        return updated;
       });
-    }
-  };
+
+      for (const f of newFiles) {
+        uploadFile(f, folderPath || undefined, encryption).catch((error) => {
+          console.error(`Upload failed for ${f.file.name}:`, error);
+        });
+      }
+    },
+    [selectedFolderPath, e2eEncryption]
+  );
 
   const handleFilesWithPathsSelect = async (
     filesWithPaths: FileWithPath[],
@@ -211,7 +223,9 @@ export const useUploadPage = () => {
 
       setFiles((prev) => [...prev, ...newFiles]);
 
-      newFiles.forEach((f) => uploadFile(f, f.folderPath || undefined));
+      newFiles.forEach((f) =>
+        uploadFile(f, f.folderPath || undefined, e2eEncryption)
+      );
     } catch (error) {
       console.error("Failed to create folder structure:", error);
     }
@@ -287,6 +301,8 @@ export const useUploadPage = () => {
     hadInterruptedUploads,
     selectedFolderPath,
     setSelectedFolderPath,
+    e2eEncryption,
+    setE2eEncryption,
     dismissInterruptedWarning: () => setHadInterruptedUploads(false),
     handleFileSelect,
     handleFilesWithPathsSelect,

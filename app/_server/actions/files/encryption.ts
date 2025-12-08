@@ -3,7 +3,7 @@
 import fs from "fs/promises";
 import path from "path";
 import { stat } from "fs/promises";
-import { getCurrentUser } from "@/app/_server/actions/auth";
+import { getCurrentUser } from "@/app/_server/actions/user";
 import {
   encryptFileData,
   decryptFileData,
@@ -30,11 +30,11 @@ interface DecryptResult {
   decryptedFilePath?: string;
 }
 
-export async function encryptFile(
+export const encryptFile = async (
   fileId: string,
   deleteOriginal: boolean = false,
   customPublicKey?: string
-): Promise<EncryptResult> {
+): Promise<EncryptResult> => {
   try {
     const user = await getCurrentUser();
     if (!user) {
@@ -97,13 +97,13 @@ export async function encryptFile(
   }
 }
 
-export async function decryptFile(
+export const decryptFile = async (
   fileId: string,
   password: string,
   outputName: string,
   deleteEncrypted: boolean = false,
   customPrivateKey?: string
-): Promise<DecryptResult> {
+): Promise<DecryptResult> => {
   try {
     const user = await getCurrentUser();
     if (!user) {
@@ -177,8 +177,8 @@ export async function decryptFile(
           decryptedFilePath: path.join(folderPath, outputName),
         };
       } catch (error) {
-        await fs.unlink(tempArchivePath).catch(() => {});
-        await fs.rmdir(outputDir, { recursive: true }).catch(() => {});
+        await fs.unlink(tempArchivePath).catch(() => { });
+        await fs.rmdir(outputDir, { recursive: true }).catch(() => { });
         throw error;
       }
     }
@@ -212,11 +212,11 @@ export async function decryptFile(
   }
 }
 
-export async function encryptFolder(
+export const encryptFolder = async (
   folderId: string,
   deleteOriginal: boolean = false,
   customPublicKey?: string
-): Promise<EncryptResult> {
+): Promise<EncryptResult> => {
   try {
     const user = await getCurrentUser();
     if (!user) {
@@ -266,7 +266,7 @@ export async function encryptFolder(
       );
 
       if (!encryptResult.success || !encryptResult.encryptedData) {
-        await fs.unlink(tempArchivePath).catch(() => {});
+        await fs.unlink(tempArchivePath).catch(() => { });
         return { success: false, message: encryptResult.message };
       }
 
@@ -294,7 +294,7 @@ export async function encryptFolder(
         ),
       };
     } catch (error) {
-      await fs.unlink(tempArchivePath).catch(() => {});
+      await fs.unlink(tempArchivePath).catch(() => { });
       throw error;
     }
   } catch (error) {
@@ -307,13 +307,13 @@ export async function encryptFolder(
   }
 }
 
-export async function decryptFolder(
+export const decryptFolder = async (
   folderId: string,
   password: string,
   outputName: string,
   deleteEncrypted: boolean = false,
   customPrivateKey?: string
-): Promise<DecryptResult> {
+): Promise<DecryptResult> => {
   try {
     const user = await getCurrentUser();
     if (!user) {
@@ -387,8 +387,8 @@ export async function decryptFolder(
         decryptedFilePath: path.join(path.dirname(folderId), outputName),
       };
     } catch (error) {
-      await fs.unlink(tempArchivePath).catch(() => {});
-      await fs.rmdir(outputDir, { recursive: true }).catch(() => {});
+      await fs.unlink(tempArchivePath).catch(() => { });
+      await fs.rmdir(outputDir, { recursive: true }).catch(() => { });
       throw error;
     }
   } catch (error) {

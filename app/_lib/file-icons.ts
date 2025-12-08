@@ -3,12 +3,12 @@ export interface FileIconInfo {
   extension?: string;
 }
 
-export function getFileIcon(fileName: string): string {
+export const getFileIcon = (fileName: string): string => {
   const info = getFileIconInfo(fileName);
   return info.materialIcon;
 }
 
-export function getFileIconInfo(fileName: string): FileIconInfo {
+export const getFileIconInfo = (fileName: string): FileIconInfo => {
   const parts = fileName.split(".");
   const ext = parts.length > 1 ? parts[parts.length - 1].toLowerCase() : "";
 
@@ -16,7 +16,6 @@ export function getFileIconInfo(fileName: string): FileIconInfo {
     return { materialIcon: "insert_drive_file" };
   }
 
-  // Extensions that should use Material Icons instead of brand icons
   const useMaterialIcon = ["gpg"];
 
   const materialIconMap: Record<string, string> = {
@@ -112,7 +111,6 @@ export function getFileIconInfo(fileName: string): FileIconInfo {
 
   const materialIcon = materialIconMap[ext] || "insert_drive_file";
 
-  // Don't return extension for files that should use Material Icons
   if (useMaterialIcon.includes(ext)) {
     return {
       materialIcon,

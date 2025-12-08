@@ -13,7 +13,7 @@ import FilesContent from "@/app/_components/FeatureComponents/FilesPage/FilesCon
 import FilesPageWrapper from "@/app/_components/GlobalComponents/Files/FilesPageWrapper";
 import MobileSidebarWrapper from "@/app/_components/FeatureComponents/FilesPage/MobileSidebarWrapper";
 import { SidebarProvider } from "@/app/_providers/SidebarProvider";
-import { getCurrentUser } from "@/app/_server/actions/auth";
+import { getCurrentUser } from "@/app/_server/actions/user";
 import FilesPageBorderWrapper from "@/app/_components/GlobalComponents/Files/FilesPageBorderWrapper";
 import { decryptPath } from "@/app/_lib/path-encryption";
 
@@ -33,7 +33,7 @@ export default async function FilesPage(props: PageProps) {
     const decodedSegments = folder.map(decodeURIComponent);
     const joinedPath = decodedSegments.join("/");
 
-    const decrypted = decryptPath(joinedPath);
+    const decrypted = await decryptPath(joinedPath);
 
     if (decrypted !== joinedPath || folder.length === 1) {
       folderPath = decrypted;
@@ -41,8 +41,6 @@ export default async function FilesPage(props: PageProps) {
       folderPath = joinedPath;
     }
   }
-
-  console.log("folderPath", folderPath);
 
   return (
     <FilesPageBorderWrapper>

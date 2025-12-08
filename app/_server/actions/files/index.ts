@@ -11,7 +11,7 @@ import { SortBy } from "@/app/_types/enums";
 import { revalidatePath } from "next/cache";
 import { getFileMimeType } from "@/app/_lib/file-utils";
 import { unstable_cache } from "next/cache";
-import { getCurrentUser } from "@/app/_server/actions/auth";
+import { getCurrentUser } from "@/app/_server/actions/user";
 
 const UPLOAD_DIR = process.env.UPLOAD_DIR || "./data/uploads";
 
@@ -24,6 +24,51 @@ interface GetFilesOptions {
   sortBy?: SortBy;
   folderPath?: string;
   recursive?: boolean;
+}
+
+const _getFiles = unstable_cache(
+  async (folderPath: string, recursive: boolean) => {
+    const scanPath = folderPath
+      ? path.join(UPLOAD_DIR, folderPath)
+      : UPLOAD_DIR;
+
+    return await scanFilesystemDirectory(
+      scanPath,
+      folderPath,
+      recursive,
+      folderPath
+    );
+  },
+  ["files-by-path"],
+  {
+    revalidate: CACHE_TTL,
+    tags: ["files"],
+  }
+);
+
+const _sortFiles = (files: FileMetadata[], sortBy: SortBy): FileMetadata[] => {
+  const sorted = [...files];
+
+  switch (sortBy) {
+    case SortBy.NAME_ASC:
+      return sorted.sort((a, b) =>
+        a.originalName.localeCompare(b.originalName)
+      );
+    case SortBy.NAME_DESC:
+      return sorted.sort((a, b) =>
+        b.originalName.localeCompare(a.originalName)
+      );
+    case SortBy.DATE_ASC:
+      return sorted.sort((a, b) => a.uploadedAt - b.uploadedAt);
+    case SortBy.DATE_DESC:
+      return sorted.sort((a, b) => b.uploadedAt - a.uploadedAt);
+    case SortBy.SIZE_ASC:
+      return sorted.sort((a, b) => a.size - b.size);
+    case SortBy.SIZE_DESC:
+      return sorted.sort((a, b) => b.size - a.size);
+    default:
+      return sorted.sort((a, b) => b.uploadedAt - a.uploadedAt);
+  }
 }
 
 async function scanFilesystemDirectory(
@@ -102,29 +147,9 @@ async function scanFilesystemDirectory(
   return files;
 }
 
-const getFilesCached = unstable_cache(
-  async (folderPath: string, recursive: boolean) => {
-    const scanPath = folderPath
-      ? path.join(UPLOAD_DIR, folderPath)
-      : UPLOAD_DIR;
-
-    return await scanFilesystemDirectory(
-      scanPath,
-      folderPath,
-      recursive,
-      folderPath
-    );
-  },
-  ["files-by-path"],
-  {
-    revalidate: CACHE_TTL,
-    tags: ["files"],
-  }
-);
-
-export async function getFiles(
+export const getFiles = async (
   options: GetFilesOptions = {}
-): Promise<ServerActionResponse<PaginatedResponse<FileMetadata>>> {
+): Promise<ServerActionResponse<PaginatedResponse<FileMetadata>>> => {
   try {
     const currentUser = await getCurrentUser();
     if (!currentUser) {
@@ -149,7 +174,7 @@ export async function getFiles(
 
     if (currentUser.isAdmin) {
       try {
-        allFiles = await getFilesCached(folderPath, shouldScanRecursive);
+        allFiles = await _getFiles(folderPath, shouldScanRecursive);
       } catch (error) {
         console.error("Filesystem scan failed:", error);
         return {
@@ -163,7 +188,7 @@ export async function getFiles(
         : currentUser.username;
 
       try {
-        allFiles = await getFilesCached(actualFolderPath, shouldScanRecursive);
+        allFiles = await _getFiles(actualFolderPath, shouldScanRecursive);
       } catch (error) {
         console.error("Filesystem scan failed:", error);
         return {
@@ -196,7 +221,7 @@ export async function getFiles(
       );
     }
 
-    const sortedFiles = sortFiles(allFiles, sortBy);
+    const sortedFiles = _sortFiles(allFiles, sortBy);
 
     const skip = (page - 1) * pageSize;
     const paginatedFiles = sortedFiles.slice(skip, skip + pageSize);
@@ -220,34 +245,9 @@ export async function getFiles(
   }
 }
 
-function sortFiles(files: FileMetadata[], sortBy: SortBy): FileMetadata[] {
-  const sorted = [...files];
-
-  switch (sortBy) {
-    case SortBy.NAME_ASC:
-      return sorted.sort((a, b) =>
-        a.originalName.localeCompare(b.originalName)
-      );
-    case SortBy.NAME_DESC:
-      return sorted.sort((a, b) =>
-        b.originalName.localeCompare(a.originalName)
-      );
-    case SortBy.DATE_ASC:
-      return sorted.sort((a, b) => a.uploadedAt - b.uploadedAt);
-    case SortBy.DATE_DESC:
-      return sorted.sort((a, b) => b.uploadedAt - a.uploadedAt);
-    case SortBy.SIZE_ASC:
-      return sorted.sort((a, b) => a.size - b.size);
-    case SortBy.SIZE_DESC:
-      return sorted.sort((a, b) => b.size - a.size);
-    default:
-      return sorted.sort((a, b) => b.uploadedAt - a.uploadedAt);
-  }
-}
-
-export async function getFileById(
+export const getFileById = async (
   id: string
-): Promise<ServerActionResponse<FileMetadata>> {
+): Promise<ServerActionResponse<FileMetadata>> => {
   try {
     const relativePath = id;
     const fullPath = path.join(UPLOAD_DIR, relativePath);
@@ -287,7 +287,7 @@ export async function getFileById(
   }
 }
 
-export async function deleteFile(id: string): Promise<ServerActionResponse> {
+export const deleteFile = async (id: string): Promise<ServerActionResponse> => {
   try {
     const currentUser = await getCurrentUser();
     if (!currentUser) {
@@ -328,10 +328,10 @@ export async function deleteFile(id: string): Promise<ServerActionResponse> {
   }
 }
 
-export async function renameFile(
+export const renameFile = async (
   fileId: string,
   newName: string
-): Promise<ServerActionResponse> {
+): Promise<ServerActionResponse> => {
   try {
     const currentUser = await getCurrentUser();
     if (!currentUser) {
@@ -391,10 +391,10 @@ export async function renameFile(
   }
 }
 
-export async function moveFile(
+export const moveFile = async (
   fileId: string,
   targetFolderPath: string
-): Promise<ServerActionResponse> {
+): Promise<ServerActionResponse> => {
   try {
     const currentUser = await getCurrentUser();
     if (!currentUser) {
@@ -448,13 +448,13 @@ export async function moveFile(
   }
 }
 
-export async function getStorageStats(): Promise<
+export const getStorageStats = async (): Promise<
   ServerActionResponse<{
     totalFiles: number;
     totalSize: number;
     averageSize: number;
   }>
-> {
+> => {
   try {
     const files = await scanFilesystemDirectory(UPLOAD_DIR, "", true);
 

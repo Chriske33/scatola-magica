@@ -10,11 +10,16 @@ import {
   importKeys,
   deleteKeys,
 } from "@/app/_server/actions/pgp";
+import {
+  getEncryptionKey,
+  regenerateEncryptionKey,
+} from "@/app/_server/actions/user";
 import { updateUserPreferences } from "@/app/_lib/preferences";
 import { usePreferences } from "@/app/_providers/PreferencesProvider";
 import Input from "@/app/_components/GlobalComponents/Form/Input";
 import Button from "@/app/_components/GlobalComponents/Buttons/Button";
 import Icon from "@/app/_components/GlobalComponents/Icons/Icon";
+import Switch from "@/app/_components/GlobalComponents/Form/Switch";
 
 interface KeyInfo {
   username: string;
@@ -27,8 +32,11 @@ interface KeyInfo {
 
 export default function EncryptionTab() {
   const router = useRouter();
-  const { user, customKeysPath } = usePreferences();
+  const { user, customKeysPath, e2eEncryptionOnTransfer: initialE2E } = usePreferences();
   const [hasKeys, setHasKeys] = useState(false);
+  const [e2eEncryptionOnTransfer, setE2eEncryptionOnTransfer] = useState(
+    initialE2E ?? true
+  );
   const [keyInfo, setKeyInfo] = useState<KeyInfo | null>(null);
   const [loading, setLoading] = useState(true);
   const [generating, setGenerating] = useState(false);
@@ -50,6 +58,9 @@ export default function EncryptionTab() {
   const [importPrivateKey, setImportPrivateKey] = useState("");
   const [importPassword, setImportPassword] = useState("");
   const [importError, setImportError] = useState("");
+  const [encryptionKey, setEncryptionKey] = useState<string | null>(null);
+  const [showEncryptionKey, setShowEncryptionKey] = useState(false);
+  const [regeneratingKey, setRegeneratingKey] = useState(false);
 
   useEffect(() => {
     loadKeyStatus();
@@ -57,7 +68,10 @@ export default function EncryptionTab() {
       setUseCustomPath(true);
       setCustomPath(customKeysPath);
     }
-  }, [customKeysPath]);
+    if (initialE2E !== undefined) {
+      setE2eEncryptionOnTransfer(initialE2E);
+    }
+  }, [customKeysPath, initialE2E]);
 
   async function loadKeyStatus() {
     setLoading(true);
@@ -65,6 +79,10 @@ export default function EncryptionTab() {
     setHasKeys(status.hasKeys);
     if (status.keyInfo) {
       setKeyInfo(status.keyInfo);
+    }
+    const keyResult = await getEncryptionKey();
+    if (keyResult.hasEncryptionKey && keyResult.encryptionKey) {
+      setEncryptionKey(keyResult.encryptionKey);
     }
     setLoading(false);
   }
@@ -215,6 +233,48 @@ export default function EncryptionTab() {
     }
   }
 
+  async function handleE2EToggle() {
+    if (!user?.username) return;
+
+    const newValue = !e2eEncryptionOnTransfer;
+    setE2eEncryptionOnTransfer(newValue);
+    await updateUserPreferences(user.username, {
+      e2eEncryptionOnTransfer: newValue,
+    });
+    router.refresh();
+  }
+
+  async function handleRegenerateEncryptionKey() {
+    if (!user?.username) return;
+
+    const confirmed = confirm(
+      "Warning: Regenerating your encryption key will affect path encryption and any stored encrypted passwords. Continue?"
+    );
+    if (!confirmed) return;
+
+    setRegeneratingKey(true);
+    setMessage(null);
+
+    const result = await regenerateEncryptionKey();
+
+    if (result.success && result.encryptionKey) {
+      setEncryptionKey(result.encryptionKey);
+      setShowEncryptionKey(true);
+      setMessage({
+        type: "success",
+        text: "Encryption key regenerated successfully",
+      });
+      router.refresh();
+    } else {
+      setMessage({
+        type: "error",
+        text: result.error || "Failed to regenerate encryption key",
+      });
+    }
+
+    setRegeneratingKey(false);
+  }
+
   if (!user) {
     return (
       <div className="p-8">
@@ -237,15 +297,70 @@ export default function EncryptionTab() {
     <div className="p-8 space-y-8">
       {message && (
         <div
-          className={`p-4 rounded-lg ${
-            message.type === "success"
-              ? "bg-success-container text-on-success-container"
-              : "bg-error-container text-on-error-container"
-          }`}
+          className={`p-4 rounded-lg ${message.type === "success"
+            ? "bg-success-container text-on-success-container"
+            : "bg-error-container text-on-error-container"
+            }`}
         >
           {message.text}
         </div>
       )}
+
+      <section className="space-y-4">
+        <h2 className="text-2xl font-bold text-on-surface">
+          Path Encryption Key
+        </h2>
+
+        <div className="p-6 bg-surface-container rounded-lg space-y-4">
+          <div className="space-y-2">
+            <p className="text-sm text-on-surface-variant">
+              This key is used to encrypt folder paths in URLs and for encrypting
+              stored passwords. It is unique to your account.
+            </p>
+            {encryptionKey && (
+              <div className="space-y-2">
+                <div className="flex items-center gap-2">
+                  <label className="text-sm font-medium text-on-surface">
+                    Encryption Key:
+                  </label>
+                  <button
+                    type="button"
+                    onClick={() => setShowEncryptionKey(!showEncryptionKey)}
+                    className="text-sm text-primary hover:underline"
+                  >
+                    {showEncryptionKey ? "Hide" : "Show"}
+                  </button>
+                </div>
+                <code className="block text-xs bg-surface p-2 rounded font-mono break-all">
+                  {showEncryptionKey
+                    ? encryptionKey
+                    : "•".repeat(encryptionKey.length)}
+                </code>
+              </div>
+            )}
+            {!encryptionKey && (
+              <p className="text-sm text-on-surface-variant">
+                No encryption key found. One will be generated automatically on
+                next login.
+              </p>
+            )}
+          </div>
+
+          <div>
+            <Button
+              variant="outlined"
+              onClick={handleRegenerateEncryptionKey}
+              disabled={regeneratingKey}
+            >
+              {regeneratingKey ? "Regenerating..." : "Regenerate Key"}
+            </Button>
+            <p className="text-xs text-on-surface-variant mt-2">
+              Regenerating your encryption key will affect all encrypted paths
+              and stored passwords.
+            </p>
+          </div>
+        </div>
+      </section>
 
       <section className="space-y-4">
         <h2 className="text-2xl font-bold text-on-surface">
@@ -295,6 +410,19 @@ export default function EncryptionTab() {
               >
                 {deleting ? "Deleting..." : "Delete Keys"}
               </Button>
+            </div>
+
+            <div className="p-6 bg-surface-container rounded-lg space-y-4">
+              <h3 className="text-lg font-semibold text-on-surface">
+                Transfer Encryption
+              </h3>
+              <Switch
+                id="e2e-encryption"
+                checked={e2eEncryptionOnTransfer}
+                onChange={handleE2EToggle}
+                label="End-to-End Encryption on Transfer"
+                description="Files will be encrypted on your device before upload and decrypted on the server. This ensures your files remain encrypted during transfer."
+              />
             </div>
           </div>
         ) : (
@@ -366,7 +494,7 @@ export default function EncryptionTab() {
                   disabled={generating}
                   error={
                     generateError &&
-                    generatePassword === generatePasswordConfirm
+                      generatePassword === generatePasswordConfirm
                       ? undefined
                       : generateError
                   }

@@ -30,7 +30,7 @@ interface UseFileListProps {
   initialHasMore: boolean;
 }
 
-export function useFileList({
+export const useFileList = ({
   initialFiles,
   folders,
   initialRecursive,
@@ -38,7 +38,7 @@ export function useFileList({
   search,
   sortBy,
   initialHasMore,
-}: UseFileListProps) {
+}: UseFileListProps) => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { registerActions } = useShortcuts();

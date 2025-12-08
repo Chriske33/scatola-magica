@@ -9,6 +9,7 @@ interface PreferencesContextType {
   user: Partial<User> | null;
   encryptionKey: string | null;
   customKeysPath?: string;
+  e2eEncryptionOnTransfer?: boolean;
 }
 
 const PreferencesContext = createContext<PreferencesContextType>({
@@ -17,15 +18,16 @@ const PreferencesContext = createContext<PreferencesContextType>({
   user: null,
   encryptionKey: null,
   customKeysPath: undefined,
+  e2eEncryptionOnTransfer: true,
 });
 
-export function PreferencesProvider({
+export const PreferencesProvider = ({
   children,
   preferences,
 }: {
   children: ReactNode;
   preferences: PreferencesContextType;
-}) {
+}) => {
   return (
     <PreferencesContext.Provider value={preferences}>
       {children}
@@ -33,6 +35,6 @@ export function PreferencesProvider({
   );
 }
 
-export function usePreferences() {
+export const usePreferences = () => {
   return useContext(PreferencesContext);
 }

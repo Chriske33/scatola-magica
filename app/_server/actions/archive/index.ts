@@ -6,10 +6,10 @@ import fs from "fs/promises";
 import { createWriteStream, statSync } from "fs";
 import path from "path";
 
-export async function createArchiveToFile(
+export const createArchiveToFile = async (
   sourcePath: string,
   outputPath: string
-): Promise<void> {
+): Promise<void> => {
   return new Promise((resolve, reject) => {
     const output = createWriteStream(outputPath);
     const archive = archiver("zip", {
@@ -37,10 +37,10 @@ export async function createArchiveToFile(
   });
 }
 
-export async function extractArchive(
+export const extractArchive = async (
   archivePath: string,
   outputDir: string
-): Promise<void> {
+): Promise<void> => {
   await fs.mkdir(outputDir, { recursive: true });
 
   const zip = new AdmZip(archivePath);

@@ -9,17 +9,17 @@ interface EncryptionProgress {
   status: "encrypting" | "complete" | "error";
 }
 
-export function useClientEncryption() {
+export const useClientEncryption = () => {
   const [encryptionProgress, setEncryptionProgress] = useState<
     EncryptionProgress[]
   >([]);
   const [isEncrypting, setIsEncrypting] = useState(false);
 
-  async function encryptFiles(
+  const encryptFiles = async (
     files: FileList,
     useOwnKey: boolean,
     customPublicKey?: string
-  ): Promise<File[]> {
+  ): Promise<File[]> => {
     setIsEncrypting(true);
     const encryptedFiles: File[] = [];
 
@@ -102,8 +102,7 @@ export function useClientEncryption() {
             )
           );
           throw new Error(
-            `Failed to encrypt ${file.name}: ${
-              error instanceof Error ? error.message : "Unknown error"
+            `Failed to encrypt ${file.name}: ${error instanceof Error ? error.message : "Unknown error"
             }`
           );
         }

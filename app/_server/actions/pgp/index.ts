@@ -8,7 +8,7 @@ if (typeof globalThis.crypto === "undefined") {
 import * as openpgp from "openpgp";
 import fs from "fs/promises";
 import path from "path";
-import { getCurrentUser } from "@/app/_server/actions/auth";
+import { getCurrentUser } from "@/app/_server/actions/user";
 
 const KEYS_DIR =
   process.env.KEYS_DIR || path.join(process.cwd(), "data/config/keys");
@@ -83,7 +83,7 @@ export const generateKeyPair = async (
         success: false,
         message: "Keys already exist. Delete existing keys first.",
       };
-    } catch {}
+    } catch { }
 
     const { privateKey, publicKey } = await openpgp.generateKey({
       type: "rsa",
@@ -270,19 +270,19 @@ export const deleteKeys = async (
 
     try {
       await fs.unlink(publicKeyPath);
-    } catch {}
+    } catch { }
 
     try {
       await fs.unlink(privateKeyPath);
-    } catch {}
+    } catch { }
 
     try {
       await fs.unlink(metadataPath);
-    } catch {}
+    } catch { }
 
     try {
       await fs.rmdir(keysDir);
-    } catch {}
+    } catch { }
 
     return { success: true, message: "Keys deleted successfully" };
   } catch (error) {
