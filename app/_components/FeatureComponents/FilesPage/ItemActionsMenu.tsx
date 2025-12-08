@@ -10,6 +10,9 @@ interface ItemActionsMenuProps {
   onMove?: () => void;
   onDownload?: () => void;
   onDelete?: () => void;
+  onEncrypt?: () => void;
+  onDecrypt?: () => void;
+  fileName?: string;
 }
 
 export default function ItemActionsMenu({
@@ -18,10 +21,15 @@ export default function ItemActionsMenu({
   onMove,
   onDownload,
   onDelete,
+  onEncrypt,
+  onDecrypt,
+  fileName,
 }: ItemActionsMenuProps) {
   const [showMenu, setShowMenu] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLDivElement>(null);
+  const isEncrypted =
+    fileName?.endsWith(".gpg") || fileName?.endsWith(".folder.gpg") || false;
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent | TouchEvent) {
@@ -48,7 +56,14 @@ export default function ItemActionsMenu({
     }
   }, [showMenu]);
 
-  if (!onRename && !onMove && !onDownload && !onDelete) {
+  if (
+    !onRename &&
+    !onMove &&
+    !onDownload &&
+    !onDelete &&
+    !onEncrypt &&
+    !onDecrypt
+  ) {
     return null;
   }
 
@@ -133,20 +148,67 @@ export default function ItemActionsMenu({
                 <span>Download</span>
               </button>
             )}
+            {(onEncrypt || onDecrypt) && (
+              <>
+                {(onOpen || onRename || onMove || onDownload) && (
+                  <div className="h-px bg-outline-variant my-2" />
+                )}
+                {isEncrypted && onDecrypt && (
+                  <button
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      onDecrypt();
+                      setShowMenu(false);
+                    }}
+                    className="w-full text-left px-4 py-2 text-sm flex items-center gap-3 transition-colors hover:bg-surface-variant active:bg-surface-variant text-on-surface"
+                    style={{ touchAction: "manipulation" }}
+                  >
+                    <Icon icon="lock_open" size="sm" />
+                    <span>Decrypt</span>
+                  </button>
+                )}
+                {!isEncrypted && onEncrypt && (
+                  <button
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      onEncrypt();
+                      setShowMenu(false);
+                    }}
+                    className="w-full text-left px-4 py-2 text-sm flex items-center gap-3 transition-colors hover:bg-surface-variant active:bg-surface-variant text-on-surface"
+                    style={{ touchAction: "manipulation" }}
+                  >
+                    <Icon icon="lock" size="sm" />
+                    <span>Encrypt</span>
+                  </button>
+                )}
+              </>
+            )}
             {onDelete && (
-              <button
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  onDelete();
-                  setShowMenu(false);
-                }}
-                className="w-full text-left px-4 py-2 text-sm flex items-center gap-3 transition-colors hover:bg-surface-variant active:bg-surface-variant text-error"
-                style={{ touchAction: "manipulation" }}
-              >
-                <Icon icon="delete" size="sm" />
-                <span>Delete</span>
-              </button>
+              <>
+                {(onOpen ||
+                  onRename ||
+                  onMove ||
+                  onDownload ||
+                  onEncrypt ||
+                  onDecrypt) && (
+                    <div className="h-px bg-outline-variant my-2" />
+                  )}
+                <button
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    onDelete();
+                    setShowMenu(false);
+                  }}
+                  className="w-full text-left px-4 py-2 text-sm flex items-center gap-3 transition-colors hover:bg-surface-variant active:bg-surface-variant text-error"
+                  style={{ touchAction: "manipulation" }}
+                >
+                  <Icon icon="delete" size="sm" />
+                  <span>Delete</span>
+                </button>
+              </>
             )}
           </div>
         )}
@@ -157,11 +219,10 @@ export default function ItemActionsMenu({
         ref={menuRef}
       >
         <div
-          className={`rounded-full p-1 transition-all duration-200 ease-out overflow-hidden ${
-            showMenu
-              ? "max-w-[200px] bg-surface"
-              : "max-w-[48px] bg-surface-variant/30"
-          }`}
+          className={`rounded-full p-1 transition-all duration-200 ease-out overflow-hidden ${showMenu
+            ? "max-w-[300px] bg-surface"
+            : "max-w-[48px] bg-surface-variant/30"
+            }`}
         >
           <div className="flex items-center gap-2.5 whitespace-nowrap px-1">
             {!showMenu ? (
@@ -214,6 +275,32 @@ export default function ItemActionsMenu({
                       onDownload();
                     }}
                     title="Download"
+                  />
+                )}
+                {isEncrypted && onDecrypt && (
+                  <IconButton
+                    icon="lock_open"
+                    size="md"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      setShowMenu(false);
+                      onDecrypt();
+                    }}
+                    title="Decrypt"
+                  />
+                )}
+                {!isEncrypted && onEncrypt && (
+                  <IconButton
+                    icon="lock"
+                    size="md"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      setShowMenu(false);
+                      onEncrypt();
+                    }}
+                    title="Encrypt"
                   />
                 )}
                 {onDelete && (

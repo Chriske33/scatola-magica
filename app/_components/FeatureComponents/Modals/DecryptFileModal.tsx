@@ -32,7 +32,9 @@ export default function DecryptFileModal({
   const router = useRouter();
   const [password, setPassword] = useState("");
   const [outputName, setOutputName] = useState(
-    fileName.endsWith(".gpg")
+    fileName.endsWith(".folder.gpg")
+      ? fileName.slice(0, -11)
+      : fileName.endsWith(".gpg")
       ? fileName.slice(0, -4)
       : fileName.replace(/\.gpg$/, "")
   );

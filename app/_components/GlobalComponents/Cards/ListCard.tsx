@@ -109,14 +109,16 @@ export default function ListCard({
       },
       {
         onFileOpen: isFolder ? undefined : onOpen,
-        onFileRename: isFolder ? undefined : onRename,
+        onFileRename: isFolder ? undefined : onRename ? handleRenameStart : undefined,
         onFileMove: isFolder ? undefined : onMove,
         onFileDownload: isFolder ? undefined : onDownload,
         onFileEncrypt: isFolder ? undefined : onEncrypt,
         onFileDecrypt: isFolder ? undefined : onDecrypt,
         onFileDelete: isFolder ? undefined : onDelete,
-        onFolderRename: isFolder ? onRename : undefined,
+        onFolderRename: isFolder && onRename ? handleRenameStart : undefined,
         onFolderDownload: isFolder ? onDownload : undefined,
+        onFolderEncrypt: isFolder ? onEncrypt : undefined,
+        onFolderDecrypt: isFolder ? onDecrypt : undefined,
         onFolderDelete: isFolder ? onDelete : undefined,
       }
     );
@@ -360,6 +362,25 @@ export default function ListCard({
             onMove={onMove ? () => onMove(itemId) : undefined}
             onDownload={onDownload ? () => onDownload(itemId) : undefined}
             onDelete={onDelete ? () => onDelete(itemId) : undefined}
+            onEncrypt={
+              isFolder
+                ? onEncrypt
+                  ? () => onEncrypt(itemId)
+                  : undefined
+                : onEncrypt
+                ? () => onEncrypt(itemId)
+                : undefined
+            }
+            onDecrypt={
+              isFolder
+                ? onDecrypt
+                  ? () => onDecrypt(itemId)
+                  : undefined
+                : onDecrypt
+                ? () => onDecrypt(itemId)
+                : undefined
+            }
+            fileName={itemName}
           />
         </div>
       )}

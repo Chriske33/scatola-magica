@@ -28,6 +28,8 @@ interface ContextMenuActions {
   onFileDelete?: (fileId: string) => void;
   onFolderRename?: (folderId: string, folderName: string) => void;
   onFolderDownload?: (folderId: string) => void;
+  onFolderEncrypt?: (folderId: string) => void;
+  onFolderDecrypt?: (folderId: string) => void;
   onFolderDelete?: (folderId: string) => void;
   onCreateFolder?: () => void;
   onUpload?: () => void;
@@ -208,11 +210,7 @@ export default function ContextMenuProvider({
             label: "Delete",
             icon: "delete",
             onClick: () => {
-              if (
-                confirm(`Are you sure you want to delete "${target.name}"?`)
-              ) {
-                actions.onFileDelete!(target.id!);
-              }
+              actions.onFileDelete!(target.id!);
             },
             danger: true,
           });
@@ -255,6 +253,40 @@ export default function ContextMenuProvider({
           });
         }
 
+        const isEncrypted = target.name?.endsWith(".folder.gpg") || false;
+
+        if (isEncrypted && actions.onFolderDecrypt && target.id) {
+          if (items.length > 0) {
+            items.push({
+              label: "",
+              icon: "",
+              onClick: () => {},
+              divider: true,
+            });
+          }
+          items.push({
+            label: "Decrypt",
+            icon: "lock_open",
+            onClick: () => actions.onFolderDecrypt!(target.id!),
+          });
+        }
+
+        if (!isEncrypted && actions.onFolderEncrypt && target.id) {
+          if (items.length > 0) {
+            items.push({
+              label: "",
+              icon: "",
+              onClick: () => {},
+              divider: true,
+            });
+          }
+          items.push({
+            label: "Encrypt",
+            icon: "lock",
+            onClick: () => actions.onFolderEncrypt!(target.id!),
+          });
+        }
+
         if (actions.onFolderDelete && target.id) {
           if (items.length > 0) {
             items.push({
@@ -268,13 +300,7 @@ export default function ContextMenuProvider({
             label: "Delete Folder",
             icon: "delete",
             onClick: () => {
-              if (
-                confirm(
-                  `Are you sure you want to delete the folder "${target.name}"? This will delete all contents.`
-                )
-              ) {
-                actions.onFolderDelete!(target.id!);
-              }
+              actions.onFolderDelete!(target.id!);
             },
             danger: true,
           });
