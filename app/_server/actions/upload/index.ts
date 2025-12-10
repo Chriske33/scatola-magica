@@ -8,6 +8,7 @@ import { revalidatePath } from "next/cache";
 import { getCurrentUser } from "@/app/_server/actions/user";
 import { decryptPath } from "@/app/_lib/path-encryption";
 import { decryptChunk } from "@/app/_server/utils/chunk-decryption";
+import { auditLog } from "@/app/_server/actions/logs";
 
 const UPLOAD_DIR = process.env.UPLOAD_DIR || "./data/uploads";
 const TEMP_DIR = `${UPLOAD_DIR}/temp`;
@@ -122,9 +123,28 @@ const _assembleFile = async (
 
     const relativePath = `${actualFolderPath}/${session.fileName}`;
 
+    await auditLog("file:upload", {
+      resource: relativePath,
+      details: {
+        fileName: session.fileName,
+        fileSize: session.fileSize,
+        e2eEncrypted: session.e2eEncrypted,
+      },
+      success: true,
+    });
+
     return relativePath;
   } catch (error) {
     console.error("Assemble file error:", error);
+    await auditLog("file:upload", {
+      resource: session.fileName,
+      details: {
+        fileName: session.fileName,
+        fileSize: session.fileSize,
+      },
+      success: false,
+      errorMessage: error instanceof Error ? error.message : "Failed to assemble file",
+    });
     throw error;
   }
 }

@@ -14,6 +14,7 @@ import {
   createArchiveToFile,
   extractArchive,
 } from "@/app/_server/actions/archive";
+import { auditLog } from "@/app/_server/actions/logs";
 
 const UPLOAD_DIR =
   process.env.UPLOAD_DIR || path.join(process.cwd(), "data/uploads");
@@ -79,6 +80,12 @@ export const encryptFile = async (
       await fs.unlink(filePath);
     }
 
+    await auditLog("file:encrypt", {
+      resource: fileId,
+      details: { customKey: !!customPublicKey, deletedOriginal: deleteOriginal },
+      success: true,
+    });
+
     revalidatePath("/", "layout");
     revalidatePath("/files", "page");
 
@@ -89,6 +96,11 @@ export const encryptFile = async (
     };
   } catch (error) {
     console.error("Error encrypting file:", error);
+    await auditLog("file:encrypt", {
+      resource: fileId,
+      success: false,
+      errorMessage: error instanceof Error ? error.message : "Failed to encrypt file",
+    });
     return {
       success: false,
       message:
@@ -168,6 +180,12 @@ export const decryptFile = async (
           await fs.unlink(filePath);
         }
 
+        await auditLog("folder:decrypt", {
+          resource: fileId,
+          details: { outputName, deletedEncrypted: deleteEncrypted },
+          success: true,
+        });
+
         revalidatePath("/", "layout");
         revalidatePath("/files", "page");
 
@@ -194,6 +212,12 @@ export const decryptFile = async (
       await fs.unlink(filePath);
     }
 
+    await auditLog("file:decrypt", {
+      resource: fileId,
+      details: { outputName, deletedEncrypted: deleteEncrypted },
+      success: true,
+    });
+
     revalidatePath("/", "layout");
     revalidatePath("/files", "page");
 
@@ -204,6 +228,11 @@ export const decryptFile = async (
     };
   } catch (error) {
     console.error("Error decrypting file:", error);
+    await auditLog("file:decrypt", {
+      resource: fileId,
+      success: false,
+      errorMessage: error instanceof Error ? error.message : "Failed to decrypt file",
+    });
     return {
       success: false,
       message:

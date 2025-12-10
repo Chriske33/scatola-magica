@@ -36,11 +36,13 @@ export default function E2EPasswordModal({
       setHasStoredPassword(hasStoredE2EPassword());
 
       if (encryptionKey) {
-        const storedPassword = getStoredE2EPassword(encryptionKey);
-        if (storedPassword) {
-          onPasswordSubmit(storedPassword);
-          onClose();
-        }
+        (async () => {
+          const storedPassword = await getStoredE2EPassword(encryptionKey);
+          if (storedPassword) {
+            onPasswordSubmit(storedPassword);
+            onClose();
+          }
+        })();
       }
     }
   }, [isOpen, encryptionKey, onPasswordSubmit, onClose]);
@@ -65,7 +67,7 @@ export default function E2EPasswordModal({
     }
 
     if (rememberForSession && encryptionKey) {
-      storeE2EPassword(password, encryptionKey);
+      await storeE2EPassword(password, encryptionKey);
     }
 
     onPasswordSubmit(password);

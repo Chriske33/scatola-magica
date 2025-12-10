@@ -123,47 +123,109 @@ export const decryptChunk = async (
   );
 };
 
-export const encryptPasswordWithKey = (
+export const encryptPasswordWithKey = async (
   password: string,
   encryptionKey: string
-): string => {
-  const combined = `${encryptionKey}:${password}`;
-  return btoa(combined)
-    .replace(/\+/g, "-")
-    .replace(/\//g, "_")
-    .replace(/=/g, "");
+): Promise<string> => {
+  const subtle = _getWebCrypto();
+  const encoder = new TextEncoder();
+
+  const keyMaterial = encoder.encode(encryptionKey);
+  const keyHash = await subtle.digest("SHA-256", keyMaterial);
+  const key = await subtle.importKey(
+    "raw",
+    keyHash,
+    { name: ALGORITHM, length: KEY_LENGTH },
+    false,
+    ["encrypt"]
+  );
+
+  const iv = _getRandomValues(new Uint8Array(IV_LENGTH));
+  const ivBuffer = new ArrayBuffer(IV_LENGTH);
+  new Uint8Array(ivBuffer).set(iv);
+
+  const passwordBuffer = encoder.encode(password);
+  const encryptedContent = await subtle.encrypt(
+    {
+      name: ALGORITHM,
+      iv: ivBuffer,
+      tagLength: AUTH_TAG_LENGTH_BITS,
+    },
+    key,
+    passwordBuffer
+  );
+
+  const result = new Uint8Array(IV_LENGTH + encryptedContent.byteLength);
+  result.set(iv, 0);
+  result.set(new Uint8Array(encryptedContent), IV_LENGTH);
+
+  const base64 = btoa(String.fromCharCode(...result));
+  return base64.replace(/\+/g, "-").replace(/\//g, "_").replace(/=/g, "");
 };
 
-export const decryptPasswordWithKey = (
+export const decryptPasswordWithKey = async (
   encryptedPassword: string,
   encryptionKey: string
-): string | null => {
+): Promise<string | null> => {
   try {
+    const subtle = _getWebCrypto();
+    const encoder = new TextEncoder();
+    const decoder = new TextDecoder();
+
     const base64 = encryptedPassword.replace(/-/g, "+").replace(/_/g, "/");
     const padded = base64 + "=".repeat((4 - (base64.length % 4)) % 4);
-    const decoded = atob(padded);
-
-    if (decoded.startsWith(`${encryptionKey}:`)) {
-      return decoded.slice(encryptionKey.length + 1);
+    const binaryString = atob(padded);
+    const bytes = new Uint8Array(binaryString.length);
+    for (let i = 0; i < binaryString.length; i++) {
+      bytes[i] = binaryString.charCodeAt(i);
     }
-    return null;
+
+    const iv = bytes.slice(0, IV_LENGTH);
+    const encryptedContent = bytes.slice(IV_LENGTH);
+
+    const keyMaterial = encoder.encode(encryptionKey);
+    const keyHash = await subtle.digest("SHA-256", keyMaterial);
+    const key = await subtle.importKey(
+      "raw",
+      keyHash,
+      { name: ALGORITHM, length: KEY_LENGTH },
+      false,
+      ["decrypt"]
+    );
+
+    const ivBuffer = new ArrayBuffer(IV_LENGTH);
+    new Uint8Array(ivBuffer).set(iv);
+
+    const decryptedBuffer = await subtle.decrypt(
+      {
+        name: ALGORITHM,
+        iv: ivBuffer,
+        tagLength: AUTH_TAG_LENGTH_BITS,
+      },
+      key,
+      encryptedContent
+    );
+
+    return decoder.decode(decryptedBuffer);
   } catch {
     return null;
   }
 };
 
-export const storeE2EPassword = (
+export const storeE2EPassword = async (
   password: string,
   encryptionKey: string
-): void => {
-  const encrypted = encryptPasswordWithKey(password, encryptionKey);
+): Promise<void> => {
+  const encrypted = await encryptPasswordWithKey(password, encryptionKey);
   sessionStorage.setItem(E2E_PASSWORD_KEY, encrypted);
 };
 
-export const getStoredE2EPassword = (encryptionKey: string): string | null => {
+export const getStoredE2EPassword = async (
+  encryptionKey: string
+): Promise<string | null> => {
   const encrypted = sessionStorage.getItem(E2E_PASSWORD_KEY);
   if (!encrypted) return null;
-  return decryptPasswordWithKey(encrypted, encryptionKey);
+  return await decryptPasswordWithKey(encrypted, encryptionKey);
 };
 
 export const clearStoredE2EPassword = (): void => {

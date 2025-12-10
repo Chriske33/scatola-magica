@@ -75,12 +75,12 @@ const UploadModal = ({
   const shouldUseE2E = e2eEncryptionOnTransfer && hasKeys;
 
   const handleE2EFileSelect = useCallback(
-    (selectedFiles: FileList | null) => {
+    async (selectedFiles: FileList | null) => {
       if (!selectedFiles || selectedFiles.length === 0) return;
 
       if (shouldUseE2E) {
         if (encryptionKey && hasStoredE2EPassword()) {
-          const storedPassword = getStoredE2EPassword(encryptionKey);
+          const storedPassword = await getStoredE2EPassword(encryptionKey);
           if (storedPassword) {
             setE2eEncryption({ enabled: true, password: storedPassword });
             handleFileSelect(selectedFiles, undefined, {

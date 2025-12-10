@@ -12,6 +12,7 @@ import { revalidatePath } from "next/cache";
 import { getFileMimeType } from "@/app/_lib/file-utils";
 import { unstable_cache } from "next/cache";
 import { getCurrentUser } from "@/app/_server/actions/user";
+import { auditLog } from "@/app/_server/actions/logs";
 
 const UPLOAD_DIR = process.env.UPLOAD_DIR || "./data/uploads";
 
@@ -305,8 +306,17 @@ export const deleteFile = async (id: string): Promise<ServerActionResponse> => {
 
     try {
       await unlink(filePath);
+      await auditLog("file:delete", {
+        resource: actualRelativePath,
+        success: true,
+      });
     } catch (error) {
       console.error("Failed to delete file from disk:", error);
+      await auditLog("file:delete", {
+        resource: actualRelativePath,
+        success: false,
+        errorMessage: error instanceof Error ? error.message : "Failed to delete file",
+      });
       return {
         success: false,
         error: "Failed to delete file",
@@ -321,6 +331,11 @@ export const deleteFile = async (id: string): Promise<ServerActionResponse> => {
     };
   } catch (error) {
     console.error("Delete file error:", error);
+    await auditLog("file:delete", {
+      resource: id,
+      success: false,
+      errorMessage: error instanceof Error ? error.message : "Failed to delete file",
+    });
     return {
       success: false,
       error: "Failed to delete file",
@@ -368,8 +383,19 @@ export const renameFile = async (
       }
 
       await rename(currentFilePath, newFilePath);
+      await auditLog("file:rename", {
+        resource: actualCurrentPath,
+        details: { newName: newName.trim() },
+        success: true,
+      });
     } catch (error) {
       console.error("Failed to rename file on filesystem:", error);
+      await auditLog("file:rename", {
+        resource: actualCurrentPath,
+        details: { newName: newName.trim() },
+        success: false,
+        errorMessage: error instanceof Error ? error.message : "Failed to rename file",
+      });
       return {
         success: false,
         error: "Failed to rename file on filesystem",
@@ -384,6 +410,12 @@ export const renameFile = async (
     };
   } catch (error) {
     console.error("Rename file error:", error);
+    await auditLog("file:rename", {
+      resource: fileId,
+      details: { newName },
+      success: false,
+      errorMessage: error instanceof Error ? error.message : "Failed to rename file",
+    });
     return {
       success: false,
       error: "Failed to rename file",
@@ -425,8 +457,19 @@ export const moveFile = async (
     try {
       await mkdir(targetDir, { recursive: true });
       await rename(currentFilePath, targetFilePath);
+      await auditLog("file:move", {
+        resource: actualCurrentPath,
+        details: { targetPath: actualTargetPath },
+        success: true,
+      });
     } catch (error) {
       console.error("Failed to move file on filesystem:", error);
+      await auditLog("file:move", {
+        resource: actualCurrentPath,
+        details: { targetPath: actualTargetPath },
+        success: false,
+        errorMessage: error instanceof Error ? error.message : "Failed to move file",
+      });
       return {
         success: false,
         error: "Failed to move file on filesystem",
@@ -441,6 +484,12 @@ export const moveFile = async (
     };
   } catch (error) {
     console.error("Move file error:", error);
+    await auditLog("file:move", {
+      resource: fileId,
+      details: { targetPath: targetFolderPath },
+      success: false,
+      errorMessage: error instanceof Error ? error.message : "Failed to move file",
+    });
     return {
       success: false,
       error: "Failed to move file",

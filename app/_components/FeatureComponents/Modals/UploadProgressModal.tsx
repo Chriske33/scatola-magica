@@ -136,24 +136,33 @@ export default function UploadProgressModal({
 
     if (shouldUseE2E) {
       if (encryptionKey && hasStoredE2EPassword()) {
-        const storedPassword = getStoredE2EPassword(encryptionKey);
-        if (storedPassword) {
-          const encryption: E2EEncryptionOptions = {
-            enabled: true,
-            password: storedPassword,
-          };
-          setE2eEncryption(encryption);
-          startUploadWithFiles(encryption);
-          return;
-        }
-      }
+        (async () => {
+          const storedPassword = await getStoredE2EPassword(encryptionKey);
+          if (storedPassword) {
+            const encryption: E2EEncryptionOptions = {
+              enabled: true,
+              password: storedPassword,
+            };
+            setE2eEncryption(encryption);
+            startUploadWithFiles(encryption);
+            return;
+          }
 
-      setPendingUpload({
-        type: initialFilesWithPaths ? "filesWithPaths" : "files",
-        files: initialFiles || undefined,
-        filesWithPaths: initialFilesWithPaths || undefined,
-      });
-      setShowPasswordModal(true);
+          setPendingUpload({
+            type: initialFilesWithPaths ? "filesWithPaths" : "files",
+            files: initialFiles || undefined,
+            filesWithPaths: initialFilesWithPaths || undefined,
+          });
+          setShowPasswordModal(true);
+        })();
+      } else {
+        setPendingUpload({
+          type: initialFilesWithPaths ? "filesWithPaths" : "files",
+          files: initialFiles || undefined,
+          filesWithPaths: initialFilesWithPaths || undefined,
+        });
+        setShowPasswordModal(true);
+      }
     } else {
       startUploadWithFiles();
     }
