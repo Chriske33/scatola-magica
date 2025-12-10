@@ -94,7 +94,11 @@
     --on-primary: #0d131a;
     --primary-container: #5a9a3a;
     --on-primary-container: #dfedfe;
-    --logo-star: #78C850;
+    --logo-box-1: #4a7a2a;
+    --logo-box-2: #5a8a3a;
+    --logo-box-3: #78C850;
+    --logo-box-4: #6ab840;
+    --logo-star: #dfedfe;
     --outline: #78C850;
   }
 
@@ -103,6 +107,10 @@
     --on-primary: #FFFFFF;
     --primary-container: #E8F5E0;
     --on-primary-container: #1C1B1F;
+    --logo-box-1: #2d2d2d;
+    --logo-box-2: #3a3a3a;
+    --logo-box-3: #4a4a4a;
+    --logo-box-4: #5a5a5a;
     --logo-star: #78C850;
     --outline: #78C850;
   }
@@ -125,10 +133,10 @@
     --on-primary: #FFFFFF;
     --primary-container: #FFE0C4;
     --on-primary-container: #1C1B1F;
-    --logo-box-1: #d66a1a;
-    --logo-box-2: #e67525;
-    --logo-box-3: #F08030;
-    --logo-box-4: #e67525;
+    --logo-box-1: #2d2d2d;
+    --logo-box-2: #3a3a3a;
+    --logo-box-3: #4a4a4a;
+    --logo-box-4: #5a5a5a;
     --logo-star: #F08030;
     --outline: #F08030;
   }
@@ -138,7 +146,11 @@
     --on-primary: #0d131a;
     --primary-container: #4a6fc8;
     --on-primary-container: #dfedfe;
-    --logo-star: #6890F0;
+    --logo-box-1: #4a6fc8;
+    --logo-box-2: #5678d8;
+    --logo-box-3: #6890F0;
+    --logo-box-4: #5a80e8;
+    --logo-star: #dfedfe;
     --outline: #6890F0;
   }
 
@@ -147,6 +159,10 @@
     --on-primary: #FFFFFF;
     --primary-container: #E8F0FF;
     --on-primary-container: #1C1B1F;
+    --logo-box-1: #2d2d2d;
+    --logo-box-2: #3a3a3a;
+    --logo-box-3: #4a4a4a;
+    --logo-box-4: #5a5a5a;
     --logo-star: #6890F0;
     --outline: #6890F0;
   }
@@ -169,10 +185,10 @@
     --on-primary: #FFFFFF;
     --primary-container: #E8E0F0;
     --on-primary-container: #1C1B1F;
-    --logo-box-1: #5a4878;
-    --logo-box-2: #655088;
-    --logo-box-3: #705898;
-    --logo-box-4: #655088;
+    --logo-box-1: #2d2d2d;
+    --logo-box-2: #3a3a3a;
+    --logo-box-3: #4a4a4a;
+    --logo-box-4: #5a5a5a;
     --logo-star: #705898;
     --outline: #705898;
   }

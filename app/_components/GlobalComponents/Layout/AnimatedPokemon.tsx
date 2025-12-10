@@ -40,17 +40,14 @@ type PokemonState = "IDLE" | "WALKING";
 
 export default function AnimatedPokemon() {
   const { resolvedPokemonTheme } = useTheme();
-
-  // Only use State for things that actually need to re-render the DOM (changing the image source)
   const [visualState, setVisualState] = useState<PokemonState>("IDLE");
 
-  // Use Refs for everything related to the high-frequency game loop
   const elementRef = useRef<HTMLDivElement>(null);
-  const positionRef = useRef(-1); // Start at -1 to indicate uninitialized
+  const positionRef = useRef(-1);
   const targetRef = useRef(0);
   const timerRef = useRef(0);
   const frameRef = useRef<number>(0);
-  const facingRef = useRef<"left" | "right">("right"); // Moved from State to Ref to prevent re-renders
+  const facingRef = useRef<"left" | "right">("right");
 
   const pokemon =
     resolvedPokemonTheme && resolvedPokemonTheme in POKEMON_THEMES
@@ -60,8 +57,6 @@ export default function AnimatedPokemon() {
   useEffect(() => {
     if (!pokemon) return;
 
-    // 1. Initialize Position (Only if not already set)
-    // We check if it's -1 so we don't reset position if the component re-renders for other reasons
     const windowWidth =
       typeof window !== "undefined" ? window.innerWidth : 1000;
     const maxX = windowWidth - POKEMON_SIZE;
@@ -70,7 +65,6 @@ export default function AnimatedPokemon() {
       positionRef.current = Math.random() * maxX;
     }
 
-    // 2. The Game Loop
     const tick = () => {
       if (!elementRef.current) return;
 
@@ -78,42 +72,32 @@ export default function AnimatedPokemon() {
       const currentPos = positionRef.current;
       const targetPos = targetRef.current;
 
-      // We recalculate window boundaries every frame in case user resized window
       const currentWindowWidth = window.innerWidth;
       const currentMaxX = currentWindowWidth - POKEMON_SIZE;
 
-      // --- LOGIC: WALKING ---
       if (Math.abs(currentPos - targetPos) > SPEED_BASE) {
-        // Switch image to Walk
         setVisualState((prev) => (prev !== "WALKING" ? "WALKING" : prev));
 
-        // Calculate movement
         const direction = targetPos > currentPos ? 1 : -1;
         positionRef.current += direction * SPEED_BASE;
 
-        // Clamp to screen
         positionRef.current = Math.max(
           0,
           Math.min(positionRef.current, currentMaxX)
         );
 
-        // Update Facing Direction (Ref only, no re-render)
         const newFacing = direction === 1 ? "right" : "left";
         facingRef.current = newFacing;
       } else {
-        // --- LOGIC: IDLE ---
-        // Switch image to Idle
         setVisualState((prev) => (prev !== "IDLE" ? "IDLE" : prev));
 
-        // Start Idle Timer if not running
         if (timerRef.current === 0) {
           timerRef.current =
             now + (IDLE_MIN + Math.random() * (IDLE_MAX - IDLE_MIN));
         }
 
-        // Timer finished? Pick new target
         if (now > timerRef.current) {
-          timerRef.current = 0; // Reset timer
+          timerRef.current = 0;
 
           let newTarget = Math.random() * currentMaxX;
           newTarget = Math.max(0, Math.min(newTarget, currentMaxX));
@@ -122,12 +106,9 @@ export default function AnimatedPokemon() {
         }
       }
 
-      // 3. RENDER (Direct DOM manipulation for performance)
       if (elementRef.current) {
-        // We read facingRef.current here immediately
-        elementRef.current.style.transform = `translateX(${
-          positionRef.current
-        }px) scaleX(${facingRef.current === "left" ? -1 : 1})`;
+        elementRef.current.style.transform = `translateX(${positionRef.current
+          }px) scaleX(${facingRef.current === "left" ? -1 : 1})`;
       }
 
       frameRef.current = requestAnimationFrame(tick);
@@ -136,7 +117,7 @@ export default function AnimatedPokemon() {
     frameRef.current = requestAnimationFrame(tick);
 
     return () => cancelAnimationFrame(frameRef.current);
-  }, [pokemon]); // Dependency array is now ONLY pokemon.
+  }, [pokemon]);
 
   if (!pokemon) return null;
 
