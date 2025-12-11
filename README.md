@@ -4,9 +4,13 @@
   <h1 align="center">Scatola Magica</h1><br/>
 </p>
 
-A simple, self-hosted file storage and management app.
+A simple, self-hosted file storage/transfer app.
 
-Tired of bloated, EXPENSIVE cloud storage solutions? Scatola Magica is a lightweight alternative for managing your personal files and folders. It's built with Next.js 14, is easy to deploy, and keeps all your data on your own server.
+[Scatola Magica](https://www.youtube.com/watch?v=pvn0KHxzesE) is a privacy first, lightweight alternative to overcomplicated, bloated file storage solutions, to transfer, manage, encrypt/decrypt your personal files and folders. It's built with Next.js 14, is easy to deploy, and keeps all your data on your own server.
+
+It features optional PGP encryption for stored items and optional AES-256-GCM encryption for file transfer. Read more about how encryption works in the [howto/ENCRYPTION.md](howto/ENCRYPTION.md) guide.
+
+Watch a quick demo of some of the app functionality [here](https://www.youtube.com/watch?v=pvn0KHxzesE) (enable subtitles!!)
 
 ---
 
@@ -257,6 +261,9 @@ yarn start
 This project is licensed under [GNU LESSER GENERAL PUBLIC LICENSE](LICENSE).
 I debated going for MIT, but I really want to protect this project and keep it open source.
 This means private corporations can use it, but they MUST keep their improvements open source as well.
+
+All image contents within this project are protected by Copyright and owned by The Pokémon Company.
+All animations for the Pokémon images have been created by the [vscode-pokemon](https://github.com/jakobhoeg/vscode-pokemon) dev.
 
 ## Support
 

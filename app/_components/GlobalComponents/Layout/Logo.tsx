@@ -1,84 +1,74 @@
 "use client";
 
-import { useId } from "react";
-
 export default function Logo({
   className = "",
   hideBox = false,
-  id = "",
   hoverEffect = false,
 }: {
   className?: string;
   hideBox?: boolean;
-  id?: string;
   hoverEffect?: boolean;
 }) {
-  const uniqueId = useId();
-  const scopedId = id || `logo-${uniqueId}`;
-
   return (
     <svg
       viewBox="0 0 594 594"
-      className={`logo-container ${className} ${
-        hoverEffect ? "hover-effect" : ""
-      }`}
-      id={scopedId}
-      suppressHydrationWarning={true}
+      className={`logo-container ${className} ${hoverEffect ? "hover-effect" : ""
+        }`}
     >
       <style>
-        {`#${scopedId} .s0 {
+        {`.logo-container .s0 {
           fill: ${hideBox ? "transparent" : "var(--logo-box-1)"};
           transition: opacity 0.3s ease;
         }
-        #${scopedId} .s1 {
+        .logo-container .s1 {
           fill: ${hideBox ? "transparent" : "var(--logo-box-2)"};
           transition: opacity 0.3s ease;
         }
-        #${scopedId} .s2 {
+        .logo-container .s2 {
           fill: ${hideBox ? "transparent" : "var(--logo-box-3)"};
           transition: opacity 0.3s ease;
         }
-        #${scopedId} .s3 {
+        .logo-container .s3 {
           fill: ${hideBox ? "transparent" : "var(--logo-box-4)"};
           transition: opacity 0.3s ease;
         }
-        #${scopedId} .s4 {
+        .logo-container .s4 {
           fill: var(--logo-star);
           transition: transform 1.5s ease-in-out;
         }
 
-        #${scopedId}:hover .s4,
-        #${scopedId}.hover-effect .s4 {
+        .logo-container:hover .s4,
+        .logo-container.hover-effect .s4 {
           animation: float 1.5s ease-in-out infinite;
         }
-        #${scopedId}.loading-animation .s4 {
+        .logo-container.loading-animation .s4 {
           animation: float 2s ease-in-out infinite;
         }
 
-        #${scopedId}:hover path[id^="Shape 12"],
-        #${scopedId}.hover-effect path[id^="Shape 12"] {
+        .logo-container:hover path[id^="Shape 12"],
+        .logo-container.hover-effect path[id^="Shape 12"] {
           animation: sparkle 2s ease-in-out infinite;
           transform-origin: center;
         }
     
-        #${scopedId}:hover path[id="Shape 12"],
-        #${scopedId}.hover-effect path[id="Shape 12"] {
+        .logo-container:hover path[id="Shape 12"],
+        .logo-container.hover-effect path[id="Shape 12"] {
           animation-delay: 0s;
         }
-        #${scopedId}:hover path[id="Shape 12 copy"],
-        #${scopedId}.hover-effect path[id="Shape 12 copy"] {
+        .logo-container:hover path[id="Shape 12 copy"],
+        .logo-container.hover-effect path[id="Shape 12 copy"] {
           animation-delay: 0.4s;
         }
-        #${scopedId}:hover path[id="Shape 12 copy 2"],
-        #${scopedId}.hover-effect path[id="Shape 12 copy 2"] {
+        .logo-container:hover path[id="Shape 12 copy 2"],
+        .logo-container.hover-effect path[id="Shape 12 copy 2"] {
           animation-delay: 0.8s;
         }
-        #${scopedId}:hover path[id="Shape 12 copy 3"],
-        #${scopedId}.hover-effect path[id="Shape 12 copy 3"] {
+        .logo-container:hover path[id="Shape 12 copy 3"],
+        .logo-container.hover-effect path[id="Shape 12 copy 3"] {
           animation-delay: 1.2s;
         }
-        #${scopedId}:hover path[id="Shape 12 copy 4"],
-        #${scopedId}.hover-effect path[id="Shape 12 copy 4"] {
+        .logo-container:hover path[id="Shape 12 copy 4"],
+        .logo-container.hover-effect path[id="Shape 12 copy 4"] {
           animation-delay: 1.6s;
         }
 
