@@ -91,7 +91,7 @@ That said for the sake of sanity let's all follow the same structure:
 
 ## Tech Stack
 
-- **Framework:** Next.js 14
+- **Framework:** Next.js 15
 - **Language:** TypeScript
 - **Styling:** Tailwind CSS
 
